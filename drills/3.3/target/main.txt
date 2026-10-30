@@ -1,0 +1,5 @@
+name = "Ada Lovelace"
+greeting = ''
+cmd = "make clean"
+The quick brown fox
+path = build

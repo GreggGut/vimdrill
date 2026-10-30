@@ -1,0 +1,8 @@
+{
+  "id": "6.2",
+  "instructions": "1. Yank billing-api into register a (\"ayE) and 9090 into the unnamed register (yE).\n2. Delete the JUNK line with the black hole register (\"_dd) so the unnamed register keeps 9090.\n3. Fill in the blanks from insert mode with Ctrl-r: 9090 after localhost: (Ctrl-r \"), billing-api after name = (Ctrl-r a), and 300 after timeout_seconds = (Ctrl-r =60*5).",
+  "solution": "f=l\"ayEj0f=lyEj\"_dd$F:a<C-r>\"<Esc>jA<C-r>a<Esc>jA<C-r>=60*5<CR><Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

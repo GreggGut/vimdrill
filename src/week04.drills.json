@@ -1,0 +1,37 @@
+[
+  {
+    "id": "4.1",
+    "instructions": "Navigate with search:\n1. /ERROR, append \" <-- check\" (A), then n and . for the other ERROR lines.\n2. G, then ?users to find the last /api/users and make it /api/v2/users.\n3. ?WARN to jump back to the \"retrying payments\" line and delete it.",
+    "solution": "/ERROR<CR>A <-- check<Esc>n.n.G?users<CR>iv2/<Esc>?WARN<CR>dd",
+    "start": {"main.txt": "2026-10-01 10:00:01 INFO  service started\n2026-10-01 10:00:05 INFO  connected to db\n2026-10-01 10:01:12 WARN  slow query (1200ms)\n2026-10-01 10:02:30 INFO  request /api/users\n2026-10-01 10:02:31 ERROR timeout talking to payments\n2026-10-01 10:03:00 INFO  request /api/orders\n2026-10-01 10:03:44 WARN  retrying payments\n2026-10-01 10:04:10 ERROR timeout talking to payments\n2026-10-01 10:05:00 INFO  request /api/users\n2026-10-01 10:06:13 INFO  cache warmed\n2026-10-01 10:07:02 ERROR disk almost full\n2026-10-01 10:08:00 INFO  shutting down"},
+    "target": {"main.txt": "2026-10-01 10:00:01 INFO  service started\n2026-10-01 10:00:05 INFO  connected to db\n2026-10-01 10:01:12 WARN  slow query (1200ms)\n2026-10-01 10:02:30 INFO  request /api/users\n2026-10-01 10:02:31 ERROR timeout talking to payments <-- check\n2026-10-01 10:03:00 INFO  request /api/orders\n2026-10-01 10:04:10 ERROR timeout talking to payments <-- check\n2026-10-01 10:05:00 INFO  request /api/v2/users\n2026-10-01 10:06:13 INFO  cache warmed\n2026-10-01 10:07:02 ERROR disk almost full <-- check\n2026-10-01 10:08:00 INFO  shutting down"}
+  },
+  {
+    "id": "4.2",
+    "instructions": "1. Rename every tmp to record: put the cursor on tmp, press *, then cgn record <Esc>, then . until done.\n2. Delete the scratch block with search as a motion: /scratch, 0, then d/^done.",
+    "solution": "j^*cgnrecord<Esc>...../scratch<CR>0d/^done<CR>",
+    "start": {"main.txt": "def process(data):\n    tmp = load(data)\n    tmp = clean(tmp)\n    tmp = enrich(tmp)\n    return tmp\n\n# --- scratch, delete from here ---\nprint(process([1, 2]))\nprint(\"testing\")\n# --- to here ---\ndone = True"},
+    "target": {"main.txt": "def process(data):\n    record = load(data)\n    record = clean(record)\n    record = enrich(record)\n    return record\n\ndone = True"}
+  },
+  {
+    "id": "4.3",
+    "instructions": "Americanize the spelling with substitute:\n1. favourite -> favorite on line 2 only (:2s/.../.../).\n2. colour -> color everywhere (:%s with g).\n3. grey -> gray everywhere, ignoring case (flags gi), so GREY becomes gray too.",
+    "solution": ":2s/favourite/favorite/<CR>:%s/colour/color/g<CR>:%s/grey/gray/gi<CR>",
+    "start": {"main.txt": "The colour of the sky is grey.\nOur favourite colour is grey, and grey is calm.\nbackground-colour: grey;\nWarning: GREY is deprecated."},
+    "target": {"main.txt": "The color of the sky is gray.\nOur favorite color is gray, and gray is calm.\nbackground-color: gray;\nWarning: gray is deprecated."}
+  },
+  {
+    "id": "4.4",
+    "instructions": "Ranges and patterns:\n1. Rename the variable cat to dog, but not category or concat (\\<cat\\>).\n2. On lines 4-5 only, turn TODO into TODO(ada) using & in the replacement.\n3. On lines 7 to the end, swap \"First Last\" to \"Last, First\" with \\( \\) groups and \\1 \\2.",
+    "solution": ":%s/\\<cat\\>/dog/g<CR>:4,5s/TODO/&(ada)/<CR>:7,$s/\\(\\w\\+\\) \\(\\w\\+\\)/\\2, \\1/<CR>",
+    "start": {"main.txt": "let cat = 1;\nlet category = 2;\nlet concat = cat + 3;\n// TODO: fix this\n// TODO: and this\n// TODO: keep this one as is\nJohn Smith\nAda Lovelace"},
+    "target": {"main.txt": "let dog = 1;\nlet category = 2;\nlet concat = dog + 3;\n// TODO(ada): fix this\n// TODO(ada): and this\n// TODO: keep this one as is\nSmith, John\nLovelace, Ada"}
+  },
+  {
+    "id": "4.5",
+    "instructions": "Review: make the left side match the right.\n- localhost -> example.com everywhere.\n- Jump with / to: true (-> false), admin (-> app), the password line (delete), level (debug -> info).",
+    "solution": ":%s/localhost/example.com/<CR>/true<CR>cwfalse<Esc>/admin<CR>cwapp<Esc>/password<CR>dd/level<CR>$ciwinfo<Esc>",
+    "start": {"main.txt": "server:\n  host: localhost\n  port: 8080\n  debug: true\ndatabase:\n  host: localhost\n  port: 5432\n  user: admin\n  password: hunter2\nlogging:\n  level: debug"},
+    "target": {"main.txt": "server:\n  host: example.com\n  port: 8080\n  debug: false\ndatabase:\n  host: example.com\n  port: 5432\n  user: app\nlogging:\n  level: info"}
+  }
+]

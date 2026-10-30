@@ -1,0 +1,37 @@
+[
+  {
+    "id": "3.1",
+    "instructions": "Jump with f/t/F/T, then fix:\n1. v1 -> v2 (f1 then r2), id=42 -> id=7.\n2. World -> Vim (fW, cw).\n3. Wrap price * quantity in parentheses (fp i(, then fy a)).\n4. Change the extension .sh -> .py ($ then T. and C).",
+    "solution": "f1r2f4xr7j0fWcwVim<Esc>j0fpi(<Esc>fya)<Esc>j$T.Cpy<Esc>",
+    "start": {"main.txt": "url = \"https://example.com/api/v1/users?id=42\"\nprint(\"Hello, World!\")\ntotal = price * quantity + tax\npath = /usr/local/bin/tool.sh"},
+    "target": {"main.txt": "url = \"https://example.com/api/v2/users?id=7\"\nprint(\"Hello, Vim!\")\ntotal = (price * quantity) + tax\npath = /usr/local/bin/tool.py"}
+  },
+  {
+    "id": "3.2",
+    "instructions": "Repeat with ; and , and combine with operators:\n1. Line 1: f= then ; to reach action=, then delete \" status=ok\" (f<Space> dt\") and \", extra\" (f, dt)).\n2. Remove \"banana, \" (fb df<Space>).\n3. Remove \"y > 0 && \" (fy dtz).\n4. From the end, F, then ; to reach the first comma, and delete the rest of the arguments (dt)).",
+    "solution": "f=;f<Space>dt\"f,dt)j0fbdf<Space>j0fydtzj$F,;dt)",
+    "start": {"main.txt": "log.info(\"user=alice action=login status=ok\", extra)\nitems = [apple, banana, cherry, date]\nif (x > 0 && y > 0 && z > 0) {\n    send(message, retries=3, timeout=30)\n}"},
+    "target": {"main.txt": "log.info(\"user=alice action=login\")\nitems = [apple, cherry, date]\nif (x > 0 && z > 0) {\n    send(message)\n}"}
+  },
+  {
+    "id": "3.3",
+    "instructions": "Word and quote text objects (the cursor doesn't need to be inside the quotes for i\" and i'):\n1. Change the name inside the quotes to Ada Lovelace (ci\").\n2. Empty the single-quoted string (di').\n3. Change the command to make clean.\n4. Delete the duplicated \"the\" (daw).\n5. Replace config.paths.output_dir with build (ciW).",
+    "solution": "ci\"Ada Lovelace<Esc>j0di'j0ci\"make clean<Esc>j0wdawj$ciWbuild<Esc>",
+    "start": {"main.txt": "name = \"John Smith\"\ngreeting = 'Good morning'\ncmd = \"rm -rf build\"\nThe the quick brown fox\npath = config.paths.output_dir"},
+    "target": {"main.txt": "name = \"Ada Lovelace\"\ngreeting = ''\ncmd = \"make clean\"\nThe quick brown fox\npath = build"}
+  },
+  {
+    "id": "3.4",
+    "instructions": "Bracket, tag and paragraph text objects:\n1. Empty the compute(...) arguments (f( di().\n2. Empty the config object (di{).\n3. Change [3, 4] to [5, 6] (ci[ from inside it).\n4. Replace the contents of <p> with: New text (cit).\n5. Delete the \"Delete this whole paragraph\" paragraph (dap).",
+    "solution": "f(di(j0f{di{j0f3ci[5, 6<Esc>j0fOcitNew text<Esc>jjdap",
+    "start": {"main.txt": "result = compute(alpha, beta, gamma)\nconfig = { debug: true, verbose: true }\nmatrix = [[1, 2], [3, 4]]\n<p>Old <b>bold</b> text</p>\n\nDelete this whole\nparagraph please.\n\nKeep this one."},
+    "target": {"main.txt": "result = compute()\nconfig = {}\nmatrix = [[1, 2], [5, 6]]\n<p>New text</p>\n\nKeep this one."}
+  },
+  {
+    "id": "3.5",
+    "instructions": "Review: make the left side match the right.\n- old -> new (ciw), v1 -> v2, GET -> POST (ci\"), and delete the cache option (d2f\").\n- Total -> Count and drop \" items\" (dt`).\n- == -> === and drop the message argument (dt)).",
+    "solution": "fociwnew<Esc>f1r2fGci\"POST<Esc>f,d2f\"j0fTcwCount<Esc>f}ldt`j0f=i=<Esc>f,dt)",
+    "start": {"main.txt": "fetch(\"https://api.old.com/v1/items\", { method: \"GET\", cache: \"no-store\" })\nconst label = `Total: ${count} items`;\nassert(value == expected, \"values differ\")"},
+    "target": {"main.txt": "fetch(\"https://api.new.com/v2/items\", { method: \"POST\" })\nconst label = `Count: ${count}`;\nassert(value === expected)"}
+  }
+]

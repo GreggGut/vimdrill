@@ -1,0 +1,8 @@
+{
+  "id": "12.2",
+  "instructions": "Turn this log into a CSV report:\n- Keep only lines with user= (:v or :g!).\n- Reorder each line to: user,action,time,level\n- Sort the rows, then add the header line user,action,time,level.\nOne :s with capture groups does the reordering.",
+  "solution": ":v/user=/d<CR>:%s/^\\S\\+ \\(\\S\\+\\) \\(\\S\\+\\) user=\\(\\S\\+\\) action=\\(\\S\\+\\)$/\\3,\\4,\\1,\\2/<CR>:sort<CR>ggOuser,action,time,level<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

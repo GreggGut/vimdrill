@@ -1,0 +1,5 @@
+The quick brownn fox jumps over the lazy dogg.
+Words stop at punctuation: foo.bar(bazz) counts as several words.
+WORDS stop only at spaces: foo.bar(baz) is one WORD, easyy.
+Use b to go back a word, and B to go back a WWORD.
+    iindented = true

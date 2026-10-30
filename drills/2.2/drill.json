@@ -1,0 +1,8 @@
+{
+  "id": "2.2",
+  "instructions": "Change the CSS values with c + a motion:\n1. red -> rebeccapurple (cw).\n2. white -> #fafafa.\n3. 1px -> 2px with s, solid -> dashed.\n4. size -> family, then C to replace the value with: Inter, sans-serif;\n5. Replace the whole margin line with: padding: 8px; (cc).",
+  "solution": "wwcwrebeccapurple<Esc>j$bcw#fafafa<Esc>j0wws2<Esc>wcwdashed<Esc>j0wwcwfamily<Esc>wwCInter, sans-serif;<Esc>jccpadding: 8px;<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

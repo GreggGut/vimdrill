@@ -1,0 +1,12 @@
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_USER=app
+export API_KEY=abc123
+export API_URL=https://api.example.com
+export LOG_LEVEL=info
+export CACHE_TTL=300
+export FEATURE_X=on
+export FEATURE_Y=off
+export MAIL_HOST=smtp.example.com
+export MAIL_PORT=587
+export TIMEZONE=UTC

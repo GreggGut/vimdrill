@@ -1,0 +1,8 @@
+{
+  "id": "11.5",
+  "open": [
+    "main.lua"
+  ],
+  "instructions": "Review in a Lua file (built-in gc uses '-- '):\n1. Comment out the two print lines (gcc).\n2. Uncomment the old function block in one go (gcgc).\n3. Rename M.old to M.legacy.",
+  "solution": ":4<CR>gccjjgcc:9<CR>gcgc:9<CR>Wwwcwlegacy<Esc>"
+}

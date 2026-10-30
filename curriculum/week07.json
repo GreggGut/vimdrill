@@ -1,0 +1,298 @@
+{
+  "week": 7,
+  "title": "Macros",
+  "goal": "Record an edit once and replay it on dozens of lines, reliably.",
+  "lessons": [
+    {
+      "id": "7.1",
+      "title": "Recording and replaying",
+      "concepts": [
+        {
+          "keys": "qa ... q",
+          "desc": "record every key you press into register a, until q."
+        },
+        {
+          "keys": "@a",
+          "desc": "replay register a."
+        },
+        {
+          "keys": "@@",
+          "desc": "replay the macro you ran last."
+        },
+        {
+          "keys": "5@a",
+          "desc": "replay 5 times. It stops early if any step fails."
+        },
+        {
+          "keys": "@:",
+          "desc": "repeat the last command-line command."
+        }
+      ],
+      "tip": "Before recording, picture the edit as it would work on ANY line, not just this one. Finish the macro on the next line (j) so you can chain it.",
+      "quiz": [
+        {
+          "id": "7.1-q1",
+          "q": "Start recording a macro into register q.",
+          "a": "qq"
+        },
+        {
+          "id": "7.1-q2",
+          "q": "Run macro q 20 times.",
+          "a": "20@q"
+        },
+        {
+          "id": "7.1-q3",
+          "q": "Re-run the macro you just ran.",
+          "a": "@@"
+        },
+        {
+          "id": "7.1-q4",
+          "q": "How do you stop recording?",
+          "a": "Press q (in normal mode)."
+        },
+        {
+          "id": "7.1-q5",
+          "q": "Why do macros usually end with j?",
+          "a": "So the cursor is on the next line, ready for the next run."
+        },
+        {
+          "id": "7.1-q6",
+          "q": "What happens to the rest of 50@a if a motion fails on run 12?",
+          "a": "The macro stops; the remaining runs are skipped."
+        }
+      ]
+    },
+    {
+      "id": "7.2",
+      "title": "Robust macros",
+      "concepts": [
+        {
+          "keys": "0 or ^ first",
+          "desc": "start with a known position on the line, not wherever the cursor happened to be."
+        },
+        {
+          "keys": "f, t) w E",
+          "desc": "move with motions that work whatever the text length; avoid l counts."
+        },
+        {
+          "keys": "/pattern<CR> or n",
+          "desc": "start with a search so the macro finds its own next target."
+        },
+        {
+          "keys": "100@a",
+          "desc": "with a huge count, the macro runs until it fails, e.g. j on the last line."
+        },
+        {
+          "keys": ":set nowrapscan",
+          "desc": "make searches fail at the end of the file so search macros don't loop forever."
+        }
+      ],
+      "tip": "Test a new macro on one line (@a), check it, then run it with a count. If it went wrong, u undoes the whole run.",
+      "quiz": [
+        {
+          "id": "7.2-q1",
+          "q": "Why start a line macro with 0 or ^?",
+          "a": "So it works the same wherever the cursor was on the line."
+        },
+        {
+          "id": "7.2-q2",
+          "q": "Your macro uses `5l` to reach the second field. Why is that fragile, and what's better?",
+          "a": "Field widths vary; use f, / W / t motions instead."
+        },
+        {
+          "id": "7.2-q3",
+          "q": "How can a macro that only edits matching lines find the next one?",
+          "a": "Start (or end) it with a search: /pattern<CR> or n."
+        },
+        {
+          "id": "7.2-q4",
+          "q": "You run 999@a with a search macro and it never stops. Why?",
+          "a": "The search wraps around to the top (wrapscan); :set nowrapscan stops it at the end."
+        },
+        {
+          "id": "7.2-q5",
+          "q": "Undo a whole macro run of 10 iterations.",
+          "a": "u (once per @a/10@a command; one undo step per run)."
+        },
+        {
+          "id": "7.2-q6",
+          "q": "Run a macro until it fails, without counting lines.",
+          "a": "Use a big count, e.g. 999@a."
+        }
+      ]
+    },
+    {
+      "id": "7.3",
+      "title": "Recursive macros",
+      "concepts": [
+        {
+          "keys": "qaq",
+          "desc": "clear register a (record nothing), so the recursive call does nothing while recording."
+        },
+        {
+          "keys": "qa ... @a q",
+          "desc": "a macro that calls itself at the end."
+        },
+        {
+          "keys": "@a",
+          "desc": "runs until a step fails (end of file, search not found)."
+        },
+        {
+          "keys": "end with j or n",
+          "desc": "the failing motion is what stops the recursion."
+        }
+      ],
+      "tip": "Always clear the register first (qaq). Otherwise the old contents of a run during recording and make a mess.",
+      "quiz": [
+        {
+          "id": "7.3-q1",
+          "q": "Why type qaq before recording a recursive macro?",
+          "a": "To empty register a so the @a inside the recording does nothing."
+        },
+        {
+          "id": "7.3-q2",
+          "q": "What stops a recursive macro?",
+          "a": "A failing step, e.g. j/↓ on the last line or a search with no more matches."
+        },
+        {
+          "id": "7.3-q3",
+          "q": "Write the key sequence skeleton for a recursive macro in register b.",
+          "a": "qbq qb ...edits... j@b q (↓@b also works), then @b"
+        },
+        {
+          "id": "7.3-q4",
+          "q": "Advantage of a recursive macro over 100@a?",
+          "a": "You don't have to guess a count; it naturally runs to the end."
+        },
+        {
+          "id": "7.3-q5",
+          "q": "During recording, does the @a at the end do anything?",
+          "a": "No (the register is empty), it's just recorded."
+        },
+        {
+          "id": "7.3-q6",
+          "q": "A recursive search macro loops forever. Fix?",
+          "a": ":set nowrapscan (so the search fails at the end of the file)."
+        }
+      ]
+    },
+    {
+      "id": "7.4",
+      "title": "Editing macros and :normal",
+      "concepts": [
+        {
+          "keys": ":let @a='...'",
+          "desc": "write a macro directly as text."
+        },
+        {
+          "keys": "\"ap ... \"ay$",
+          "desc": "paste a macro onto a line, fix it, yank it back (0\"ay$)."
+        },
+        {
+          "keys": "\"Aq... / qA",
+          "desc": "append more keys to an existing macro by recording with the uppercase name."
+        },
+        {
+          "keys": ":{range}norm {keys}",
+          "desc": "run normal-mode keys on every line of a range, e.g. :%norm A;"
+        },
+        {
+          "keys": ":'<,'>norm @a",
+          "desc": "run a macro on every selected line (press : in visual mode)."
+        },
+        {
+          "keys": ":g/pat/norm @a",
+          "desc": "run it on every line matching pat (more in week 8)."
+        }
+      ],
+      "tip": ":norm runs from the start of each line and keeps going after a failing line, so it's often more forgiving than counts.",
+      "quiz": [
+        {
+          "id": "7.4-q1",
+          "q": "Append ; to every line in the file without a macro.",
+          "a": ":%norm A;"
+        },
+        {
+          "id": "7.4-q2",
+          "q": "Run macro a on lines 10 to 20.",
+          "a": ":10,20norm @a"
+        },
+        {
+          "id": "7.4-q3",
+          "q": "How do you fix a typo inside a recorded macro?",
+          "a": "Paste it (\"ap), edit the line, yank it back (0\"ay$), then delete the line. Or :let @a='...'."
+        },
+        {
+          "id": "7.4-q4",
+          "q": "Add more steps to the end of macro a.",
+          "a": "qA ... q (record with the uppercase register)."
+        },
+        {
+          "id": "7.4-q5",
+          "q": "Run macro a on every selected line.",
+          "a": ":'<,'>norm @a (press : in visual mode, then norm @a)"
+        },
+        {
+          "id": "7.4-q6",
+          "q": "Run a macro only on lines containing TODO.",
+          "a": ":g/TODO/norm @a"
+        }
+      ]
+    },
+    {
+      "id": "7.5",
+      "title": "Week 7 review",
+      "concepts": [
+        {
+          "keys": "qa q @a @@ 5@a",
+          "desc": "record and replay"
+        },
+        {
+          "keys": "0 f, / n",
+          "desc": "robust positioning"
+        },
+        {
+          "keys": "qaq qa...@aq",
+          "desc": "recursion"
+        },
+        {
+          "keys": ":let @a :norm",
+          "desc": "editing and ranges"
+        }
+      ],
+      "tip": "If you're about to do the same edit for the third time, stop and record it.",
+      "quiz": [
+        {
+          "id": "7.5-q1",
+          "q": "Record a macro in w that appends a comma and moves down.",
+          "a": "qwA,<Esc>jq"
+        },
+        {
+          "id": "7.5-q2",
+          "q": "Run macro w on every line of the current paragraph.",
+          "a": "vip:norm @w"
+        },
+        {
+          "id": "7.5-q3",
+          "q": "Inspect what's in macro w.",
+          "a": ":reg w"
+        },
+        {
+          "id": "7.5-q4",
+          "q": "Repeat the last :command.",
+          "a": "@:"
+        },
+        {
+          "id": "7.5-q5",
+          "q": "Make a macro that finds and processes each line with FIXME, to the end of the file only.",
+          "a": ":set nowrapscan, then qa/FIXME<CR>...q and 999@a (or a recursive macro)"
+        },
+        {
+          "id": "7.5-q6",
+          "q": "Why can't you use 5l to move to a CSV's second field in a macro?",
+          "a": "The first field's length varies per line; use f, instead."
+        }
+      ]
+    }
+  ]
+}

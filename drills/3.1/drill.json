@@ -1,0 +1,8 @@
+{
+  "id": "3.1",
+  "instructions": "Jump with f/t/F/T, then fix:\n1. v1 -> v2 (f1 then r2), id=42 -> id=7.\n2. World -> Vim (fW, cw).\n3. Wrap price * quantity in parentheses (fp i(, then fy a)).\n4. Change the extension .sh -> .py ($ then T. and C).",
+  "solution": "f1r2f4xr7j0fWcwVim<Esc>j0fpi(<Esc>fya)<Esc>j$T.Cpy<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

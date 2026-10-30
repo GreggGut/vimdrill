@@ -1,0 +1,8 @@
+{
+  "id": "4.3",
+  "instructions": "Americanize the spelling with substitute:\n1. favourite -> favorite on line 2 only (:2s/.../.../).\n2. colour -> color everywhere (:%s with g).\n3. grey -> gray everywhere, ignoring case (flags gi), so GREY becomes gray too.",
+  "solution": ":2s/favourite/favorite/<CR>:%s/colour/color/g<CR>:%s/grey/gray/gi<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

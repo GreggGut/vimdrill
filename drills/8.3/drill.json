@@ -1,0 +1,8 @@
+{
+  "id": "8.3",
+  "instructions": "1. Sort the fruit lines and drop the duplicate: :2,6sort u\n2. Indent them by two spaces: :2,5norm I  (two spaces)\n3. Add a comma to each: :2,5norm A,\n4. Sort the ranking numerically. Use a search range:\n   :/ranking/+1,$sort n",
+  "solution": ":2,6sort u<CR>:2,5norm I  <CR>:2,5norm A,<CR>:/ranking/+1,$sort n<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,6 @@
+# app.conf
+name = shop
+mode = staging
+
+workers = 8
+log = info

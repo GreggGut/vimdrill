@@ -1,0 +1,8 @@
+{
+  "id": "6.5",
+  "instructions": "Review:\n1. Set mark a on line 3 (ma).\n2. Yank the three URLs into registers a, b and c (\"ayiW ...).\n3. Under \"## Links\", add a \"- \" line for each URL with Ctrl-r a/b/c.\n4. Jump back to the mark ('a) and change See to Visit.",
+  "solution": ":3<CR>maW\"ayiWj0WWW\"byiWj05W\"cyiWGo- <C-r>a<CR>- <C-r>b<CR>- <C-r>c<Esc>'acwVisit<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

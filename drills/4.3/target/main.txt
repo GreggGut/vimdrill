@@ -1,0 +1,4 @@
+The color of the sky is gray.
+Our favorite color is gray, and gray is calm.
+background-color: gray;
+Warning: gray is deprecated.

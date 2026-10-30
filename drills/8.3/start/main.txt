@@ -1,0 +1,13 @@
+const fruits = [
+'pear'
+'apple'
+'banana'
+'apple'
+'cherry'
+];
+
+// ranking
+10 alice
+9 bob
+100 carol
+25 dave

@@ -1,0 +1,9 @@
+function greet(name, greeting) {
+  return greeting + ", " + name;
+}
+
+function unused() {
+  console.log("delete me");
+}
+
+const msg = greet("World", "Hello");

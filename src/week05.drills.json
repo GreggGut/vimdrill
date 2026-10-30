@@ -1,0 +1,57 @@
+[
+  {
+    "id": "5.1",
+    "instructions": "1. Change localhost to 0.0.0.0 (select the value with vE, then c).\n2. Delete the three debug lines with V and d.\n3. Yank the server's host+port lines (V, y) and paste them under a new [cache] section at the end, with a blank line before [cache].",
+    "solution": "jwwvEc0.0.0.0<Esc>jjVjjdggjVjyGo<CR>[cache]<Esc>p",
+    "start": {
+      "main.txt": "[server]\nhost = localhost\nport = 8080\ndebug = true\ndebug_level = verbose\ndebug_log = /tmp/debug.log\n\n[database]\nhost = db.internal\nport = 5432"
+    },
+    "target": {
+      "main.txt": "[server]\nhost = 0.0.0.0\nport = 8080\n\n[database]\nhost = db.internal\nport = 5432\n\n[cache]\nhost = 0.0.0.0\nport = 8080"
+    }
+  },
+  {
+    "id": "5.2",
+    "instructions": "Use Ctrl-v (visual block) for each step:\n1. Delete the id column (Ctrl-v, select it, d).\n2. Put \"| \" at the start of every line (Ctrl-v down, I).\n3. Put \" |\" at the end of every line (Ctrl-v down, $A).\n4. Change both \"dev\" values to \"eng\" in one go (block select, c).",
+    "solution": "<C-v>4j4ld<C-v>4jI| <Esc><C-v>4j$A |<Esc>:3<CR>WW<C-v>jeceng<Esc>",
+    "start": {
+      "main.txt": "id   name     role\n1    alice    admin\n2    bob      dev\n3    carol    dev\n4    dave     ops"
+    },
+    "target": {
+      "main.txt": "| name     role |\n| alice    admin |\n| bob      eng |\n| carol    eng |\n| dave     ops |"
+    }
+  },
+  {
+    "id": "5.3",
+    "instructions": "Select, then operate:\n1. Lowercase DEBUG (select it, u).\n2. Uppercase api_base_url and max_retries (select each, U).\n3. Join the three short sentence lines into one (V, select, J).\n4. Lowercase WARNING.",
+    "solution": "f\"lveuj0wveUj0wveUj0VjjJj0veu",
+    "start": {
+      "main.txt": "const LOG_LEVEL = \"DEBUG\";\nconst api_base_url = \"https://example.com\";\nconst max_retries = 3;\nThis sentence was\nwrapped way too\nearly.\nWARNING: do not edit"
+    },
+    "target": {
+      "main.txt": "const LOG_LEVEL = \"debug\";\nconst API_BASE_URL = \"https://example.com\";\nconst MAX_RETRIES = 3;\nThis sentence was wrapped way too early.\nwarning: do not edit"
+    }
+  },
+  {
+    "id": "5.4",
+    "instructions": "Select with text objects:\n1. Delete the whole unused() function and the blank line after it (vap, d).\n2. Change the arguments of the greet(...) call to \"Vim\", \"Hi\" (vi(, c).\n3. Change the \", \" string on line 2 to \" - \" (f\" onto the quote, then vi\", c).",
+    "solution": ":5<CR>vapdf(vi(c\"Vim\", \"Hi\"<Esc>:2<CR>0f\"vi\"c - <Esc>",
+    "start": {
+      "main.txt": "function greet(name, greeting) {\n  return greeting + \", \" + name;\n}\n\nfunction unused() {\n  console.log(\"delete me\");\n}\n\nconst msg = greet(\"World\", \"Hello\");"
+    },
+    "target": {
+      "main.txt": "function greet(name, greeting) {\n  return greeting + \" - \" + name;\n}\n\nconst msg = greet(\"Vim\", \"Hi\");"
+    }
+  },
+  {
+    "id": "5.5",
+    "instructions": "Review:\n1. Uppercase the SQL keywords select, from, where, order by (select, U).\n2. Delete the two debug comment lines (V).\n3. Comment out the three insert lines by putting \"-- \" in front (Ctrl-v, I).",
+    "solution": "veUjveUjveUjveeUjVjd<C-v>jjI-- <Esc>",
+    "start": {
+      "main.txt": "select id, name, email\nfrom users\nwhere active = 1\norder by name;\n-- debug: remove these\n-- two lines\ninsert into log values (1);\ninsert into log values (2);\ninsert into log values (3);"
+    },
+    "target": {
+      "main.txt": "SELECT id, name, email\nFROM users\nWHERE active = 1\nORDER BY name;\n-- insert into log values (1);\n-- insert into log values (2);\n-- insert into log values (3);"
+    }
+  }
+]

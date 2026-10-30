@@ -1,0 +1,9 @@
+select id, name, email
+from users
+where active = 1
+order by name;
+-- debug: remove these
+-- two lines
+insert into log values (1);
+insert into log values (2);
+insert into log values (3);

@@ -1,0 +1,8 @@
+{
+  "id": "8.4",
+  "instructions": "1. Sort the three data rows with the shell: :2,4!sort\n2. Uppercase the header with the shell: :1!tr a-z A-Z\n3. Bump the patch version 1.4.9 to 1.4.10 (put the cursor on 9, then Ctrl-a).\n4. Raise retries from 3 to 5 (2 Ctrl-a).\n5. Renumber the steps 1, 2, 3: select the test and deploy lines with V, then g Ctrl-a.",
+  "solution": ":2,4!sort<CR>:1!tr a-z A-Z<CR>/version<CR>$<C-a>j2<C-a>jjVjg<C-a>",
+  "open": [
+    "main.txt"
+  ]
+}

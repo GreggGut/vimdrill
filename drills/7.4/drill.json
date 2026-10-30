@@ -1,0 +1,8 @@
+{
+  "id": "7.4",
+  "instructions": "Fix the 8 let lines (not the comments) without recording interactively:\n1. Write a macro directly: :let @a='A;'  and run it on the block: vip then :norm @a\n2. Write a second one: :let @b='0cwconst'  and run it on the same block: gv then :norm @b",
+  "solution": ":let @a='A;'<CR>vip:norm @a<CR>:let @b='0cwconst'<CR>gv:norm @b<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,326 @@
+{
+  "week": 11,
+  "title": "Neovim as an IDE",
+  "goal": "Syntax trees, a language server, completion, commenting and surround: IDE features, driven by vim grammar.",
+  "lessons": [
+    {
+      "id": "11.1",
+      "title": "Treesitter: the editor understands your code",
+      "concepts": [
+        {
+          "keys": "vim.treesitter.start()",
+          "desc": "turn on treesitter highlighting for the buffer. Lua, Markdown and help files get it automatically. Other languages need a FileType autocmd."
+        },
+        {
+          "keys": ":InspectTree",
+          "desc": "show the syntax tree of the buffer. Move in it and the source cursor follows."
+        },
+        {
+          "keys": "van / vin (visual)",
+          "desc": "select the parent syntax node (repeat an to grow) / a child node (in to shrink)."
+        },
+        {
+          "keys": "foldexpr = v:lua.vim.treesitter.foldexpr()",
+          "desc": "fold by syntax: functions, blocks, objects."
+        },
+        {
+          "keys": "zc / zo / za / zR / zM",
+          "desc": "close / open / toggle a fold; open all / close all."
+        },
+        {
+          "keys": ":Inspect",
+          "desc": "show the highlight groups and treesitter captures under the cursor."
+        }
+      ],
+      "tip": "`van` pressed again and again is the fastest way to select \"this argument, this call, this statement, this function\" without counting brackets.",
+      "quiz": [
+        {
+          "id": "11.1-q1",
+          "q": "Which command shows the syntax tree of the current buffer?",
+          "a": ":InspectTree"
+        },
+        {
+          "id": "11.1-q2",
+          "q": "In visual mode, which keys expand the selection to the parent syntax node?",
+          "a": "an (repeat to keep growing); in shrinks to a child node."
+        },
+        {
+          "id": "11.1-q3",
+          "q": "How do you enable treesitter highlighting for C files?",
+          "a": "A FileType autocmd for 'c' that calls vim.treesitter.start()"
+        },
+        {
+          "id": "11.1-q4",
+          "q": "Which foldexpr gives syntax-aware folding?",
+          "a": "v:lua.vim.treesitter.foldexpr() (with foldmethod=expr)"
+        },
+        {
+          "id": "11.1-q5",
+          "q": "Toggle the fold under the cursor; open all folds.",
+          "a": "za; zR"
+        },
+        {
+          "id": "11.1-q6",
+          "q": "Which parsers ship with Neovim 0.12 itself?",
+          "a": "c, lua, vim, vimdoc, query, markdown, markdown_inline. Others (TypeScript, Python, ...) come from nvim-treesitter."
+        }
+      ]
+    },
+    {
+      "id": "11.2",
+      "title": "LSP: plug in a language server",
+      "concepts": [
+        {
+          "keys": "~/.config/nvim/lsp/<name>.lua",
+          "desc": "a server config file that returns { cmd, filetypes, root_markers, settings }."
+        },
+        {
+          "keys": "vim.lsp.config(name, {...})",
+          "desc": "define or extend a server config from init.lua (merged with lsp/<name>.lua)."
+        },
+        {
+          "keys": "vim.lsp.enable(name)",
+          "desc": "start the server automatically for matching filetypes."
+        },
+        {
+          "keys": "root_markers",
+          "desc": "files that mark the project root (tsconfig.json, package.json, .git)."
+        },
+        {
+          "keys": ":checkhealth vim.lsp",
+          "desc": "see enabled configs, attached clients and their log file."
+        },
+        {
+          "keys": "nvim-lspconfig (optional)",
+          "desc": "plugin that ships ready-made lsp/*.lua configs for hundreds of servers."
+        }
+      ],
+      "tip": "Learn it once without plugins: a 4-line lsp/tsc.lua plus vim.lsp.enable('tsc') is the whole setup. TypeScript 7's compiler is its own language server (tsc --lsp --stdio). nvim-lspconfig just saves you writing those files.",
+      "quiz": [
+        {
+          "id": "11.2-q1",
+          "q": "Which function turns on a configured server for future buffers?",
+          "a": "vim.lsp.enable('name')"
+        },
+        {
+          "id": "11.2-q2",
+          "q": "What does an lsp/<name>.lua file return?",
+          "a": "A table with the config: cmd, filetypes, root_markers and optionally settings."
+        },
+        {
+          "id": "11.2-q3",
+          "q": "What is `root_markers` for?",
+          "a": "To find the project root by looking upward for those files; the server starts with that root as its workspace."
+        },
+        {
+          "id": "11.2-q4",
+          "q": "How do you check whether a server is attached to the current buffer?",
+          "a": ":checkhealth vim.lsp"
+        },
+        {
+          "id": "11.2-q5",
+          "q": "TypeScript 7: what command starts its built-in language server?",
+          "a": "tsc --lsp --stdio"
+        },
+        {
+          "id": "11.2-q6",
+          "q": "What does nvim-lspconfig give you in Neovim 0.11+?",
+          "a": "Ready-made lsp/<name>.lua configs; you still call vim.lsp.enable()."
+        }
+      ]
+    },
+    {
+      "id": "11.3",
+      "title": "LSP keys: navigate and refactor",
+      "concepts": [
+        {
+          "keys": "K",
+          "desc": "hover documentation / type of the symbol under the cursor."
+        },
+        {
+          "keys": "Ctrl-] / Ctrl-o",
+          "desc": "go to definition (through LSP tagfunc) / jump back."
+        },
+        {
+          "keys": "grn / gra / grr / gri / grt",
+          "desc": "rename / code action / references / implementation / type definition."
+        },
+        {
+          "keys": "gO",
+          "desc": "list the document's symbols (outline)."
+        },
+        {
+          "keys": "]d / [d / ]D / [D",
+          "desc": "next / previous / last / first diagnostic."
+        },
+        {
+          "keys": "Ctrl-w d",
+          "desc": "show the diagnostic under the cursor in a floating window."
+        },
+        {
+          "keys": "Ctrl-s (insert)",
+          "desc": "signature help while typing arguments."
+        }
+      ],
+      "tip": "Ctrl-] to dive into a definition, Ctrl-o to come back: it's the jump list you learned in week 6, now crossing files. Rename (grn) from the definition: at an import site the server may just add an alias.",
+      "quiz": [
+        {
+          "id": "11.3-q1",
+          "q": "Rename the symbol under the cursor across the project.",
+          "a": "grn"
+        },
+        {
+          "id": "11.3-q2",
+          "q": "List all references to the symbol under the cursor.",
+          "a": "grr (results go to the quickfix list)."
+        },
+        {
+          "id": "11.3-q3",
+          "q": "Jump to the next diagnostic, then show its full message.",
+          "a": "]d, then Ctrl-w d"
+        },
+        {
+          "id": "11.3-q4",
+          "q": "Show hover docs for the symbol under the cursor.",
+          "a": "K"
+        },
+        {
+          "id": "11.3-q5",
+          "q": "Open code actions (e.g. add missing import).",
+          "a": "gra"
+        },
+        {
+          "id": "11.3-q6",
+          "q": "You jumped to a definition with Ctrl-]. How do you go back?",
+          "a": "Ctrl-o (or Ctrl-t from the tag stack)."
+        }
+      ]
+    },
+    {
+      "id": "11.4",
+      "title": "Completion, commenting and surround",
+      "concepts": [
+        {
+          "keys": "vim.lsp.completion.enable(true, id, buf, {autotrigger=true})",
+          "desc": "built-in LSP completion, turned on in an LspAttach autocmd."
+        },
+        {
+          "keys": "Ctrl-n / Ctrl-p / Ctrl-y / Ctrl-e",
+          "desc": "next / previous item, accept, cancel the completion menu."
+        },
+        {
+          "keys": "Ctrl-x Ctrl-o",
+          "desc": "trigger omni (LSP) completion manually."
+        },
+        {
+          "keys": "gcc / gc{motion} / gc (visual)",
+          "desc": "toggle comments on a line / a motion (gcip, gc3j) / a selection. Built in."
+        },
+        {
+          "keys": "ys{motion}{char}",
+          "desc": "nvim-surround: add surroundings. ysiw\" quotes a word, yss) wraps the line."
+        },
+        {
+          "keys": "gcgc / dgc",
+          "desc": "gc is also a text object for a block of commented lines: gcgc uncomments the block, dgc deletes it."
+        },
+        {
+          "keys": "cs{old}{new} / ds{char}",
+          "desc": "nvim-surround: change cs\"' / delete ds( surroundings."
+        }
+      ],
+      "tip": "gc is an operator like d or y, so text objects work: gcip comments a paragraph, gcap includes the blank line, and . repeats it.",
+      "quiz": [
+        {
+          "id": "11.4-q1",
+          "q": "Comment out the current paragraph.",
+          "a": "gcip"
+        },
+        {
+          "id": "11.4-q2",
+          "q": "Accept the selected completion item (built-in menu).",
+          "a": "Ctrl-y"
+        },
+        {
+          "id": "11.4-q3",
+          "q": "nvim-surround: change surrounding double quotes to single quotes.",
+          "a": "cs\"'"
+        },
+        {
+          "id": "11.4-q4",
+          "q": "nvim-surround: wrap the word under the cursor in parentheses.",
+          "a": "ysiw) (or ysiw( for padding with spaces)"
+        },
+        {
+          "id": "11.4-q5",
+          "q": "nvim-surround: delete the surrounding brackets [ ].",
+          "a": "ds] (or ds[)"
+        },
+        {
+          "id": "11.4-q6",
+          "q": "Where do you call vim.lsp.completion.enable, and why there?",
+          "a": "In an LspAttach autocmd: it needs the client id and buffer of the server that just attached."
+        }
+      ]
+    },
+    {
+      "id": "11.5",
+      "title": "Week 11 review",
+      "concepts": [
+        {
+          "keys": "gcc / gcip",
+          "desc": "toggle comment on a line / paragraph (uses 'commentstring', e.g. -- %s for Lua)."
+        },
+        {
+          "keys": "K Ctrl-] grn gra grr",
+          "desc": "hover, definition, rename, action, references."
+        },
+        {
+          "keys": "]d [d Ctrl-w d",
+          "desc": "diagnostics"
+        },
+        {
+          "keys": "van vin :InspectTree",
+          "desc": "syntax-tree selection"
+        },
+        {
+          "keys": "ys cs ds",
+          "desc": "surround"
+        }
+      ],
+      "tip": "The IDE features are operators and motions too: gc takes text objects, grr fills the quickfix list you navigate with :cn.",
+      "quiz": [
+        {
+          "id": "11.5-q1",
+          "q": "Comment the current line and the 2 lines below it.",
+          "a": "gc2j (or 3gcc)"
+        },
+        {
+          "id": "11.5-q2",
+          "q": "Which option decides what comment marker gc uses?",
+          "a": "'commentstring'"
+        },
+        {
+          "id": "11.5-q3",
+          "q": "Show the type signature while typing function arguments in insert mode.",
+          "a": "Ctrl-s"
+        },
+        {
+          "id": "11.5-q4",
+          "q": "Go to the first diagnostic in the buffer.",
+          "a": "[D"
+        },
+        {
+          "id": "11.5-q5",
+          "q": "Show the document outline (symbols).",
+          "a": "gO"
+        },
+        {
+          "id": "11.5-q6",
+          "q": "Select the whole enclosing function call with treesitter, starting from an argument.",
+          "a": "v then an (repeat an until the call is selected)."
+        }
+      ]
+    }
+  ]
+}

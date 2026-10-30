@@ -1,0 +1,4 @@
+url = "https://example.com/api/v1/users?id=42"
+print("Hello, World!")
+total = price * quantity + tax
+path = /usr/local/bin/tool.sh

@@ -1,0 +1,8 @@
+{
+  "id": "3.5",
+  "instructions": "Review: make the left side match the right.\n- old -> new (ciw), v1 -> v2, GET -> POST (ci\"), and delete the cache option (d2f\").\n- Total -> Count and drop \" items\" (dt`).\n- == -> === and drop the message argument (dt)).",
+  "solution": "fociwnew<Esc>f1r2fGci\"POST<Esc>f,d2f\"j0fTcwCount<Esc>f}ldt`j0f=i=<Esc>f,dt)",
+  "open": [
+    "main.txt"
+  ]
+}

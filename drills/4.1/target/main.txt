@@ -1,0 +1,11 @@
+2026-10-01 10:00:01 INFO  service started
+2026-10-01 10:00:05 INFO  connected to db
+2026-10-01 10:01:12 WARN  slow query (1200ms)
+2026-10-01 10:02:30 INFO  request /api/users
+2026-10-01 10:02:31 ERROR timeout talking to payments <-- check
+2026-10-01 10:03:00 INFO  request /api/orders
+2026-10-01 10:04:10 ERROR timeout talking to payments <-- check
+2026-10-01 10:05:00 INFO  request /api/v2/users
+2026-10-01 10:06:13 INFO  cache warmed
+2026-10-01 10:07:02 ERROR disk almost full <-- check
+2026-10-01 10:08:00 INFO  shutting down

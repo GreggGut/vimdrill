@@ -1,0 +1,55 @@
+[
+  {
+    "id": "12.1",
+    "open": [
+      "main.js"
+    ],
+    "instructions": "Refactor this function (vimgolf: find the shortest route):\n1. Rename total -> orderTotal.\n2. var sum -> let sum.\n3. Replace the index loop header with: for (const item of items)\n4. Use += and item instead of items[i] in the loop body.\nIdeas: cw, ci(, :s with a pattern, & to repeat a substitution.",
+    "solution": "wcworderTotal<Esc>j^cwlet<Esc>jf(ci(const item of items<Esc>j:s/= sum +/+=/<CR>:s/items\\[i\\]/item/g<CR>",
+    "start": {
+      "main.js": "function total(items) {\n    var sum = 0;\n    for (var i = 0; i < items.length; i++) {\n        sum = sum + items[i].price * items[i].qty;\n    }\n    return sum;\n}"
+    },
+    "target": {
+      "main.js": "function orderTotal(items) {\n    let sum = 0;\n    for (const item of items) {\n        sum += item.price * item.qty;\n    }\n    return sum;\n}"
+    }
+  },
+  {
+    "id": "12.2",
+    "instructions": "Turn this log into a CSV report:\n- Keep only lines with user= (:v or :g!).\n- Reorder each line to: user,action,time,level\n- Sort the rows, then add the header line user,action,time,level.\nOne :s with capture groups does the reordering.",
+    "solution": ":v/user=/d<CR>:%s/^\\S\\+ \\(\\S\\+\\) \\(\\S\\+\\) user=\\(\\S\\+\\) action=\\(\\S\\+\\)$/\\3,\\4,\\1,\\2/<CR>:sort<CR>ggOuser,action,time,level<Esc>",
+    "start": {
+      "main.txt": "2026-10-16 08:01:02 INFO user=alice action=login\n2026-10-16 08:02:30 DEBUG cache warmed\n2026-10-16 08:03:44 WARN user=bob action=retry\n2026-10-16 08:04:10 INFO user=alice action=logout\n2026-10-16 08:05:00 DEBUG gc pause 12ms\n2026-10-16 08:05:59 ERROR user=carol action=login"
+    },
+    "target": {
+      "main.txt": "user,action,time,level\nalice,login,08:01:02,INFO\nalice,logout,08:04:10,INFO\nbob,retry,08:03:44,WARN\ncarol,login,08:05:59,ERROR"
+    }
+  },
+  {
+    "id": "12.3",
+    "instructions": "Rewrite this key = value config as JSON:\n- Every line becomes   \"key\": \"value\",   indented by 2 spaces.\n- Numbers and true/false lose their quotes.\n- No comma after the last entry. Wrap everything in { }.\nTwo substitutions, then a couple of small edits.\nautoindent will indent the new { } lines: type 0 then Ctrl-d to drop the indent.",
+    "solution": ":%s/\\(\\w\\+\\) = \\(.*\\)/  \"\\1\": \"\\2\",/<CR>:%s/\"\\(\\d\\+\\|true\\|false\\)\"/\\1/<CR>G$xggO0<C-d>{<Esc>Go0<C-d>}<Esc>",
+    "start": {
+      "main.txt": "host = localhost\nport = 8080\nuser = admin\ndebug = true\nretries = 3\nregion = eu-north-1"
+    },
+    "target": {
+      "main.txt": "{\n  \"host\": \"localhost\",\n  \"port\": 8080,\n  \"user\": \"admin\",\n  \"debug\": true,\n  \"retries\": 3,\n  \"region\": \"eu-north-1\"\n}"
+    }
+  },
+  {
+    "id": "12.4",
+    "instructions": "Turn each row into an SQL INSERT. Record a macro on the first line, then replay it:\n  alice 34 admin  ->  INSERT INTO users VALUES ('alice', 34, 'admin');\nMake the macro end on the next line (j) so 3@a or 100@a finishes the job.\n(A :%s solution is fine too, but the point of this one is the macro.)",
+    "solution": "qaIINSERT INTO users VALUES ('<Esc>ea',<Esc>wea,<Esc>wi'<Esc>A');<Esc>jq3@a",
+    "start": {
+      "main.txt": "alice 34 admin\nbob 27 editor\ncarol 45 viewer\ndave 31 editor"
+    },
+    "target": {
+      "main.txt": "INSERT INTO users VALUES ('alice', 34, 'admin');\nINSERT INTO users VALUES ('bob', 27, 'editor');\nINSERT INTO users VALUES ('carol', 45, 'viewer');\nINSERT INTO users VALUES ('dave', 31, 'editor');"
+    }
+  },
+  {
+    "id": "12.5",
+    "type": "task",
+    "instructions": "Graduation: write your own cheat sheet, in Neovim of course.\n\nCreate ~/vim-mastery/my-cheatsheet.md with at least 40 non-empty lines: the commands\nYOU actually use, grouped your way (motions, operators, text objects, search, registers,\nmacros, ex commands, windows, your mappings, LSP keys...). Write each entry in your own words.\n\nIdeas while writing it:\n- :r !vimdrill --show 4.2   reads a lesson card into the buffer to start from\n- use macros and :s to format your list, gq to wrap long lines, gcc to comment out drafts\n- go through the lessons you found hardest (/vim-daily knows your misses) and write those down\n\nThen run: vimdrill --check",
+    "check": "# --- shared helpers (read-only checks) ---\nfail=0\nok()  { printf '  \\033[32m\u2714\\033[0m %s\\n' \"$1\"; }\nbad() { printf '  \\033[31m\u2718\\033[0m %s\\n' \"$1\"; [ -n \"$2\" ] && printf '      \u2192 %s\\n' \"$2\"; fail=1; }\n# q 'lua expression' : evaluate with your real config, print the result\nq() { nvim --headless -c \"lua io.stdout:write(tostring($1))\" -c 'qa!' 2>/dev/null; }\nCFG=$(nvim --headless --clean -c 'lua io.stdout:write(vim.fn.stdpath(\"config\"))' -c 'qa!' 2>/dev/null)\nDATA=$(nvim --headless --clean -c 'lua io.stdout:write(vim.fn.stdpath(\"data\"))' -c 'qa!' 2>/dev/null)\nstartup_errors() { nvim --headless -c 'qa!' 2>&1 | grep -iE 'error|E[0-9]{3,4}:' | head -5; }\nfinish() { if [ $fail -eq 0 ]; then echo \"All checks passed.\"; exit 0; else echo \"Not done yet - fix the \u2718 items and run: vimdrill --check\"; exit 1; fi; }\n# ---\n\nF=~/vim-mastery/my-cheatsheet.md\nif [ ! -f \"$F\" ]; then bad \"no $F yet\" \"nvim $F\"; finish; fi\nn=$(grep -c '[^[:space:]]' \"$F\")\n[ \"$n\" -ge 40 ] && ok \"$n non-empty lines\" || bad \"only $n non-empty lines (need 40)\" \"keep writing\"\ns=$(grep -c '^#' \"$F\"); [ \"$s\" -ge 3 ] && ok \"$s section headings\" || bad \"fewer than 3 headings (# ...)\" \"group it into sections\"\nfinish\n"
+  }
+]

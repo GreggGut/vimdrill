@@ -1,0 +1,8 @@
+{
+  "id": "5.2",
+  "instructions": "Use Ctrl-v (visual block) for each step:\n1. Delete the id column (Ctrl-v, select it, d).\n2. Put \"| \" at the start of every line (Ctrl-v down, I).\n3. Put \" |\" at the end of every line (Ctrl-v down, $A).\n4. Change both \"dev\" values to \"eng\" in one go (block select, c).",
+  "solution": "<C-v>4j4ld<C-v>4jI| <Esc><C-v>4j$A |<Esc>:3<CR>WW<C-v>jeceng<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

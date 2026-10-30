@@ -1,0 +1,10 @@
+2026-10-01 09:00 INFO  service started
+2026-10-01 09:00 DEBUG cache warm
+
+2026-10-01 09:01 ERROR db timeout
+2026-10-01 09:01 INFO  GET /users 200
+2026-10-01 09:02 TRACE retry 1
+
+2026-10-01 09:03 ERROR disk full
+2026-10-01 09:03 INFO  GET /health 200
+2026-10-01 09:04 DEBUG gc pause 12ms

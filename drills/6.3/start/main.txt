@@ -1,0 +1,12 @@
+# app.conf
+name = shop
+mode = production
+
+# BEGIN legacy
+legacy_auth = on
+legacy_cache = on
+legacy_port = 7000
+# END legacy
+
+workers = 4
+log = info

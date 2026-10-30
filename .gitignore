@@ -1,0 +1,5 @@
+__pycache__/
+# a learner's own progress, never committed
+state.json
+log.jsonl
+tracker_url

@@ -1,0 +1,8 @@
+{
+  "id": "4.2",
+  "instructions": "1. Rename every tmp to record: put the cursor on tmp, press *, then cgn record <Esc>, then . until done.\n2. Delete the scratch block with search as a motion: /scratch, 0, then d/^done.",
+  "solution": "j^*cgnrecord<Esc>...../scratch<CR>0d/^done<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "9.1",
+  "instructions": "Three files are open as buffers (:ls lists them).\n1. main.txt: append \" v2\" to the title.\n2. :bn to notes.txt and delete its last line.\n3. :b todo to jump by name, then add a last line: ship it\n4. Ctrl-^ back to notes.txt and add a first line: reviewed\n5. :e changelog.txt (a new file) and type: - added v2\n6. Save everything with :wa",
+  "solution": "A v2<Esc>:bn<CR>Gdd:b todo<CR>Goship it<Esc><C-^>ggOreviewed<Esc>:e changelog.txt<CR>i- added v2<Esc>:wa<CR>",
+  "open": [
+    "main.txt",
+    "notes.txt",
+    "todo.txt"
+  ],
+  "diff": false
+}

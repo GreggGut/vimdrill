@@ -1,0 +1,8 @@
+{
+  "id": "7.5",
+  "instructions": "Review: turn the CSV into SQL.\n1. Delete the header line.\n2. Record a macro that turns 1,Alice,admin into  INSERT INTO users VALUES (1,'Alice','admin');  (f, is your friend) and moves down.\n3. Run it on the remaining rows.",
+  "solution": "ddqa0iINSERT INTO users VALUES (<Esc>f,a'<Esc>f,i'<Esc>la'<Esc>A');<Esc>jq7@a",
+  "open": [
+    "main.txt"
+  ]
+}

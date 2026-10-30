@@ -1,0 +1,37 @@
+[
+  {
+    "id": "1.1",
+    "instructions": "Remove the doubled letters: brownn, dogg, bazz, easyy, WWORD and iindented.\nUse w/b/e/W/B/E and 0/^/$ to get there, then x. Avoid holding ← / →.",
+    "solution": "wwex$bexj0WWWWwwwwexj$bexj$Bxj^x",
+    "start": {"main.txt": "The quick brownn fox jumps over the lazy dogg.\nWords stop at punctuation: foo.bar(bazz) counts as several words.\nWORDS stop only at spaces: foo.bar(baz) is one WORD, easyy.\nUse b to go back a word, and B to go back a WWORD.\n    iindented = true"},
+    "target": {"main.txt": "The quick brown fox jumps over the lazy dog.\nWords stop at punctuation: foo.bar(baz) counts as several words.\nWORDS stop only at spaces: foo.bar(baz) is one WORD, easy.\nUse b to go back a word, and B to go back a WORD.\n    indented = true"}
+  },
+  {
+    "id": "1.2",
+    "instructions": "1. Add a first line: // math helpers\n2. End the two const lines and the return line with ;\n3. Indent the return line by 4 spaces.\n4. Add a last line: export { add };\nUse O, o, A and I. Don't move with $ or 0 before inserting.",
+    "solution": "O// math helpers<Esc>jA;<Esc>jA;<Esc>jjI    <Esc>A;<Esc>joexport { add };<Esc>",
+    "start": {"main.txt": "const a = 1\nconst b = 2\nfunction add(x, y) {\nreturn x + y\n}"},
+    "target": {"main.txt": "// math helpers\nconst a = 1;\nconst b = 2;\nfunction add(x, y) {\n    return x + y;\n}\nexport { add };"}
+  },
+  {
+    "id": "1.3",
+    "instructions": "1. Line 3 starts with a stray X: jump there with :3 and delete it.\n2. Put --- on each blank line. Hop between them with }.\n3. Jump to the last line (G) and append \" (end)\".\n4. Jump to the first line (gg) and add \"# Title\" above it.",
+    "solution": ":3<CR>x}i---<Esc>}i---<Esc>}i---<Esc>GA (end)<Esc>ggO# Title<Esc>",
+    "start": {"main.txt": "Paragraph one, line one.\nParagraph one, line two.\nXParagraph one, line three.\n\nParagraph two, line one.\nParagraph two, line two.\n\nParagraph three, line one.\nParagraph three, line two.\nParagraph three, line three.\n\nParagraph four is alone."},
+    "target": {"main.txt": "# Title\nParagraph one, line one.\nParagraph one, line two.\nParagraph one, line three.\n---\nParagraph two, line one.\nParagraph two, line two.\n---\nParagraph three, line one.\nParagraph three, line two.\nParagraph three, line three.\n---\nParagraph four is alone. (end)"}
+  },
+  {
+    "id": "1.4",
+    "instructions": "Fix every line without entering insert mode:\n1. Capitalize Hello and lowercase World (~).\n2. Join lines 2 and 3 (J).\n3. Lowercase FOR SHOUTING (try 3~ and 8~).\n4. Fix the caps-lock line in one go (g~~).\n5. Replace the commas with spaces (r).",
+    "solution": "~w~jJj0w3~w8~j0g~~j0wwwr<Space>wwr<Space>",
+    "start": {"main.txt": "hello World\nthis line\n  should be joined.\nsorry FOR SHOUTING\ntHE cAPS lOCK kEY wAS oN\nreplace the commas,with,spaces"},
+    "target": {"main.txt": "Hello world\nthis line should be joined.\nsorry for shouting\nThe Caps Lock Key Was On\nreplace the commas with spaces"}
+  },
+  {
+    "id": "1.5",
+    "instructions": "Review: make the left side match the right.\n- Capitalize the two headings.\n- Put \"- \" in front of the shopping items and add \"- coffee\".\n- Fix bikee.\n- Add a last line: done.",
+    "solution": "w~jI- <Esc>jI- <Esc>jI- <Esc>o- coffee<Esc>jj0w~jj$xGodone.<Esc>",
+    "start": {"main.txt": "# shopping list\nmilk\neggs\nbread\n\n# todo\ncall mom\nfix the bikee\npay rent"},
+    "target": {"main.txt": "# Shopping list\n- milk\n- eggs\n- bread\n- coffee\n\n# Todo\ncall mom\nfix the bike\npay rent\ndone."}
+  }
+]

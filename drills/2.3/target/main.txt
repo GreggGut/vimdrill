@@ -1,0 +1,8 @@
+the quick fix
+- First step
+- Second step
+- Third step
+- Fourth step
+host = "localhost"
+port = 8080
+allowed = "localhost"

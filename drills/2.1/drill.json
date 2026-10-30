@@ -1,0 +1,8 @@
+{
+  "id": "2.1",
+  "instructions": "Clean up the function using d + a motion:\n1. Remove the debug_flag parameter (put the cursor on the comma, de).\n2. Remove the TODO comment after 0 (D).\n3. Delete the print line (dd).\n4. Delete everything below return (dG from the blank line).",
+  "solution": "wwwwdej^wwlDjjddjjdG",
+  "open": [
+    "main.txt"
+  ]
+}

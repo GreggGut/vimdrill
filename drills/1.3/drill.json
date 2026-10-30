@@ -1,0 +1,8 @@
+{
+  "id": "1.3",
+  "instructions": "1. Line 3 starts with a stray X: jump there with :3 and delete it.\n2. Put --- on each blank line. Hop between them with }.\n3. Jump to the last line (G) and append \" (end)\".\n4. Jump to the first line (gg) and add \"# Title\" above it.",
+  "solution": ":3<CR>x}i---<Esc>}i---<Esc>}i---<Esc>GA (end)<Esc>ggO# Title<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

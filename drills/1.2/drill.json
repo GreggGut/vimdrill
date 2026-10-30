@@ -1,0 +1,8 @@
+{
+  "id": "1.2",
+  "instructions": "1. Add a first line: // math helpers\n2. End the two const lines and the return line with ;\n3. Indent the return line by 4 spaces.\n4. Add a last line: export { add };\nUse O, o, A and I. Don't move with $ or 0 before inserting.",
+  "solution": "O// math helpers<Esc>jA;<Esc>jA;<Esc>jjI    <Esc>A;<Esc>joexport { add };<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

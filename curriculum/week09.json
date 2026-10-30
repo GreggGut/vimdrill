@@ -1,0 +1,111 @@
+{
+  "week": 9,
+  "title": "Buffers, windows, tabs, many files",
+  "goal": "Work across a whole project from one vim: switch files instantly, split the screen, and change many files in one command.",
+  "lessons": [
+    {
+      "id": "9.1",
+      "title": "Buffers",
+      "concepts": [
+        {"keys": ":e file", "desc": "open (or create) a file in the current window."},
+        {"keys": ":ls", "desc": "list buffers: % is current, # is alternate, + is modified."},
+        {"keys": ":b N / :b name", "desc": "switch to buffer N, or by part of its name (Tab completes)."},
+        {"keys": ":bn / :bp", "desc": "next / previous buffer."},
+        {"keys": "Ctrl-^", "desc": "toggle between the current and the alternate (previous) file."},
+        {"keys": ":wa / :qa / :wqa", "desc": "write all / quit all / write and quit all buffers."},
+        {"keys": ":bd", "desc": "delete (close) the current buffer."}
+      ],
+      "tip": "A buffer is an open file; a window is just a view onto one. Neovim keeps modified buffers hidden when you switch, so :b away freely and :wa at the end.",
+      "quiz": [
+        {"id": "9.1-q1", "q": "Jump back and forth between the last two files you were in.", "a": "Ctrl-^"},
+        {"id": "9.1-q2", "q": "Switch to the buffer whose name contains 'router'.", "a": ":b router (Tab to complete)"},
+        {"id": "9.1-q3", "q": "In :ls output, what do % and # mean?", "a": "% is the current buffer, # the alternate buffer."},
+        {"id": "9.1-q4", "q": "Save every modified buffer at once.", "a": ":wa"},
+        {"id": "9.1-q5", "q": "Go to the next buffer in the list.", "a": ":bn"},
+        {"id": "9.1-q6", "q": "What happens with `:e notes.md` if notes.md doesn't exist?", "a": "Vim opens an empty buffer for it; the file is created when you write it."}
+      ]
+    },
+    {
+      "id": "9.2",
+      "title": "Windows and splits",
+      "concepts": [
+        {"keys": ":sp file / :vs file", "desc": "split horizontally / vertically (without a file: split the current one)."},
+        {"keys": "Ctrl-w ← ↓ ↑ →", "desc": "move to the window left / down / up / right (Ctrl-w h/j/k/l also works)."},
+        {"keys": "Ctrl-w w / Ctrl-w p", "desc": "cycle through windows / go to the previous window."},
+        {"keys": "Ctrl-w c / Ctrl-w o", "desc": "close this window / close all others (only)."},
+        {"keys": "Ctrl-w = / Ctrl-w _ / Ctrl-w |", "desc": "equalize sizes / maximize height / maximize width."},
+        {"keys": "Ctrl-w s / Ctrl-w v", "desc": "split the current window horizontally / vertically."}
+      ],
+      "tip": "Registers are shared across windows: yank in one split, paste in another. Closing a window never closes the buffer - it's still in :ls.",
+      "quiz": [
+        {"id": "9.2-q1", "q": "Open utils.js in a vertical split.", "a": ":vs utils.js"},
+        {"id": "9.2-q2", "q": "Move to the window on the right.", "a": "Ctrl-w l"},
+        {"id": "9.2-q3", "q": "Close every window except the current one.", "a": "Ctrl-w o (or :only)"},
+        {"id": "9.2-q4", "q": "Make all windows the same size.", "a": "Ctrl-w ="},
+        {"id": "9.2-q5", "q": "What does Ctrl-w c do to the buffer shown in that window?", "a": "Nothing - only the window closes; the buffer stays loaded."},
+        {"id": "9.2-q6", "q": "Jump back to the window you were in before.", "a": "Ctrl-w p"}
+      ]
+    },
+    {
+      "id": "9.3",
+      "title": "Tabs and the argument list",
+      "concepts": [
+        {"keys": ":tabe file", "desc": "open a file in a new tab page (a tab holds its own window layout)."},
+        {"keys": "gt / gT / Ngt", "desc": "next / previous tab / go to tab N."},
+        {"keys": ":tabc / :tabo", "desc": "close this tab / close all other tabs."},
+        {"keys": ":args / :args *.py", "desc": "show / set the argument list (the files vim was started with)."},
+        {"keys": ":argdo cmd | update", "desc": "run a command in every argument file and save the changed ones."},
+        {"keys": ":bufdo cmd | update", "desc": "the same for every open buffer."}
+      ],
+      "tip": "Add the e flag in :argdo %s/a/b/ge so files without a match don't stop the run with an error.",
+      "quiz": [
+        {"id": "9.3-q1", "q": "Replace foo with bar in every argument file and save them.", "a": ":argdo %s/foo/bar/ge | update"},
+        {"id": "9.3-q2", "q": "Go to the next tab.", "a": "gt"},
+        {"id": "9.3-q3", "q": "Why the `e` flag in `%s/foo/bar/ge` under :argdo?", "a": "So files with no match don't raise an error that aborts the run."},
+        {"id": "9.3-q4", "q": "Make the argument list all Markdown files in the current directory.", "a": ":args *.md"},
+        {"id": "9.3-q5", "q": "What's the difference between :argdo and :bufdo?", "a": ":argdo runs over the argument list, :bufdo over every listed buffer."},
+        {"id": "9.3-q6", "q": "Go straight to tab 3.", "a": "3gt"}
+      ]
+    },
+    {
+      "id": "9.4",
+      "title": ":vimgrep and the quickfix list",
+      "concepts": [
+        {"keys": ":vimgrep /pat/ **/*.js", "desc": "search files recursively; matches go into the quickfix list and vim jumps to the first."},
+        {"keys": ":copen / :cclose", "desc": "open / close the quickfix window (Enter on a line jumps there)."},
+        {"keys": ":cn / :cp", "desc": "next / previous match."},
+        {"keys": ":cfirst / :clast", "desc": "first / last match."},
+        {"keys": ":cdo cmd | update", "desc": "run a command on every match line and save."},
+        {"keys": ":cfdo cmd | update", "desc": "run it once per file in the list (e.g. :cfdo %s/a/b/g | update)."}
+      ],
+      "tip": "vimgrep + cdo is project-wide search and replace with no plugins: :vimgrep /old/ **/*.js then :cdo s/old/new/ | update.",
+      "quiz": [
+        {"id": "9.4-q1", "q": "Search all .ts files under the current directory for 'TODO'.", "a": ":vimgrep /TODO/ **/*.ts"},
+        {"id": "9.4-q2", "q": "Go to the next quickfix match.", "a": ":cn"},
+        {"id": "9.4-q3", "q": "Show the list of all matches.", "a": ":copen"},
+        {"id": "9.4-q4", "q": "Replace old with new on every match line and save.", "a": ":cdo s/old/new/ | update"},
+        {"id": "9.4-q5", "q": "Difference between :cdo and :cfdo?", "a": ":cdo runs per match (line), :cfdo once per file."},
+        {"id": "9.4-q6", "q": "What does `**` mean in a vimgrep file pattern?", "a": "Any number of directories (recursive)."}
+      ]
+    },
+    {
+      "id": "9.5",
+      "title": "Week 9 review",
+      "concepts": [
+        {"keys": ":e :ls :b Ctrl-^ :wa", "desc": "buffers"},
+        {"keys": ":sp :vs Ctrl-w arrows/w/c/o", "desc": "windows"},
+        {"keys": ":tabe gt gT :argdo", "desc": "tabs and argument list"},
+        {"keys": ":vimgrep :copen :cn :cdo", "desc": "project search and replace"}
+      ],
+      "tip": "Use one buffer per file, windows when you need two side by side, and quickfix whenever the job is 'every place where X'.",
+      "quiz": [
+        {"id": "9.5-q1", "q": "Rename a function in every .go file under the current directory and save.", "a": ":vimgrep /oldName/ **/*.go then :cdo s/oldName/newName/ | update"},
+        {"id": "9.5-q2", "q": "Open config.yaml next to the current file, side by side.", "a": ":vs config.yaml"},
+        {"id": "9.5-q3", "q": "Return to the file you were editing just before this one.", "a": "Ctrl-^"},
+        {"id": "9.5-q4", "q": "Close the current window only.", "a": "Ctrl-w c"},
+        {"id": "9.5-q5", "q": "Quit vim, saving all buffers.", "a": ":wqa"},
+        {"id": "9.5-q6", "q": "List open buffers.", "a": ":ls"}
+      ]
+    }
+  ]
+}

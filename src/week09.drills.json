@@ -1,0 +1,90 @@
+[
+  {
+    "id": "9.1",
+    "instructions": "Three files are open as buffers (:ls lists them).\n1. main.txt: append \" v2\" to the title.\n2. :bn to notes.txt and delete its last line.\n3. :b todo to jump by name, then add a last line: ship it\n4. Ctrl-^ back to notes.txt and add a first line: reviewed\n5. :e changelog.txt (a new file) and type: - added v2\n6. Save everything with :wa",
+    "solution": "A v2<Esc>:bn<CR>Gdd:b todo<CR>Goship it<Esc><C-^>ggOreviewed<Esc>:e changelog.txt<CR>i- added v2<Esc>:wa<CR>",
+    "open": ["main.txt", "notes.txt", "todo.txt"],
+    "diff": false,
+    "start": {
+      "main.txt": "# Project\nSome text about the project.",
+      "notes.txt": "meeting at 10\nbring laptop\nobsolete note",
+      "todo.txt": "write code\ntest code"
+    },
+    "target": {
+      "main.txt": "# Project v2\nSome text about the project.",
+      "notes.txt": "reviewed\nmeeting at 10\nbring laptop",
+      "todo.txt": "write code\ntest code\nship it",
+      "changelog.txt": "- added v2"
+    }
+  },
+  {
+    "id": "9.2",
+    "instructions": "Move clamp() from utils.js into main.js using windows:\n1. :vs utils.js and cut the function there with dap.\n2. In its place type: // moved to main.js\n3. Ctrl-w w to the main.js window, then ggP to paste it at the top.\n4. :sp README.md and add a last line: - clamp() now lives in main.js\n5. Ctrl-w c to close the README window, then :wa",
+    "solution": ":vs utils.js<CR>dapi// moved to main.js<Esc><C-w>wggP:sp README.md<CR>Go- clamp() now lives in main.js<Esc><C-w>c:wa<CR>",
+    "open": ["main.js"],
+    "diff": false,
+    "start": {
+      "main.js": "const speed = clamp(input, 0, 120);\nconsole.log(speed);",
+      "utils.js": "function clamp(x, lo, hi) {\n  return Math.min(Math.max(x, lo), hi);\n}",
+      "README.md": "# Speed tool\n\nNotes:"
+    },
+    "target": {
+      "main.js": "function clamp(x, lo, hi) {\n  return Math.min(Math.max(x, lo), hi);\n}\nconst speed = clamp(input, 0, 120);\nconsole.log(speed);",
+      "utils.js": "// moved to main.js",
+      "README.md": "# Speed tool\n\nNotes:\n- clamp() now lives in main.js"
+    }
+  },
+  {
+    "id": "9.3",
+    "instructions": "a.py, b.py and c.py are the argument list (:args).\n1. Rename fetch_data to load_data in all of them in one command:\n   :argdo %s/fetch_data/load_data/ge | update\n2. Open d.py in a new tab (:tabe d.py) and add a last line: print(load_data(\"d\"))\n3. gt back to the first tab (it now shows c.py) and add a last line: # checked\n4. :wa",
+    "solution": ":argdo %s/fetch_data/load_data/ge | update<CR>:tabe d.py<CR>Goprint(load_data(\"d\"))<Esc>gtGo# checked<Esc>:wa<CR>",
+    "open": ["a.py", "b.py", "c.py"],
+    "diff": false,
+    "start": {
+      "a.py": "from api import fetch_data\n\nrows = fetch_data(\"users\")",
+      "b.py": "from api import fetch_data\n\ndef refresh():\n    return fetch_data(\"orders\")",
+      "c.py": "import api\n\nprint(\"no calls here\")",
+      "d.py": "from api import load_data"
+    },
+    "target": {
+      "a.py": "from api import load_data\n\nrows = load_data(\"users\")",
+      "b.py": "from api import load_data\n\ndef refresh():\n    return load_data(\"orders\")",
+      "c.py": "import api\n\nprint(\"no calls here\")\n# checked",
+      "d.py": "from api import load_data\nprint(load_data(\"d\"))"
+    }
+  },
+  {
+    "id": "9.4",
+    "instructions": "1. Find every console.log in the project:\n   :vimgrep /console\\.log/ **/*.js   (:copen shows the list)\n2. Replace them all through the quickfix list:\n   :cdo s/console\\.log/logger.debug/ | update\n3. :vimgrep /FIXME/ **/*.js, then :cn to the second match (in db.js) and delete that line with dd.\n4. :wa",
+    "solution": ":vimgrep /console\\.log/ **/*.js<CR>:cdo s/console\\.log/logger.debug/ | update<CR>:vimgrep /FIXME/ **/*.js<CR>:cn<CR>dd:wa<CR>",
+    "open": ["src/app.js"],
+    "diff": false,
+    "start": {
+      "src/app.js": "import { query } from './db.js';\nconsole.log('starting');\nconst users = query('users');\nconsole.log(users);\n// FIXME handle errors",
+      "src/db.js": "export function query(table) {\n  console.log('query', table);\n  return [];\n}\n// FIXME close connection",
+      "src/util/format.js": "export const fmt = (s) => s.trim();\n// FIXME support numbers"
+    },
+    "target": {
+      "src/app.js": "import { query } from './db.js';\nlogger.debug('starting');\nconst users = query('users');\nlogger.debug(users);\n// FIXME handle errors",
+      "src/db.js": "export function query(table) {\n  logger.debug('query', table);\n  return [];\n}",
+      "src/util/format.js": "export const fmt = (s) => s.trim();\n// FIXME support numbers"
+    }
+  },
+  {
+    "id": "9.5",
+    "instructions": "Review:\n1. Rename startServer to runServer across the Go files:\n   :vimgrep /startServer/ *.go then :cdo s/startServer/runServer/ | update\n2. :vs config.yaml, change the port to 9090, then close that window with Ctrl-w c.\n3. :b handlers and change TODO to listen.\n4. Ctrl-^ back to main.go and add a last line: // v2\n5. :wa",
+    "solution": ":vimgrep /startServer/ *.go<CR>:cdo s/startServer/runServer/ | update<CR>:vs config.yaml<CR>$ciw9090<Esc><C-w>c:b handlers<CR>/TODO<CR>cwlisten<Esc><C-^>Go// v2<Esc>:wa<CR>",
+    "open": ["main.go", "handlers.go"],
+    "diff": false,
+    "start": {
+      "main.go": "package main\n\nfunc main() {\n\tstartServer(8080)\n}",
+      "handlers.go": "package main\n\nfunc startServer(port int) {\n\t// TODO\n}",
+      "config.yaml": "port: 8080"
+    },
+    "target": {
+      "main.go": "package main\n\nfunc main() {\n\trunServer(8080)\n}\n// v2",
+      "handlers.go": "package main\n\nfunc runServer(port int) {\n\t// listen\n}",
+      "config.yaml": "port: 9090"
+    }
+  }
+]

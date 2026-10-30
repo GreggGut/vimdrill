@@ -1,0 +1,8 @@
+{
+  "id": "5.5",
+  "instructions": "Review:\n1. Uppercase the SQL keywords select, from, where, order by (select, U).\n2. Delete the two debug comment lines (V).\n3. Comment out the three insert lines by putting \"-- \" in front (Ctrl-v, I).",
+  "solution": "veUjveUjveUjveeUjVjd<C-v>jjI-- <Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

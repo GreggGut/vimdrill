@@ -1,0 +1,8 @@
+{
+  "id": "5.1",
+  "instructions": "1. Change localhost to 0.0.0.0 (select the value with vE, then c).\n2. Delete the three debug lines with V and d.\n3. Yank the server's host+port lines (V, y) and paste them under a new [cache] section at the end, with a blank line before [cache].",
+  "solution": "jwwvEc0.0.0.0<Esc>jjVjjdggjVjyGo<CR>[cache]<Esc>p",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "4.4",
+  "instructions": "Ranges and patterns:\n1. Rename the variable cat to dog, but not category or concat (\\<cat\\>).\n2. On lines 4-5 only, turn TODO into TODO(ada) using & in the replacement.\n3. On lines 7 to the end, swap \"First Last\" to \"Last, First\" with \\( \\) groups and \\1 \\2.",
+  "solution": ":%s/\\<cat\\>/dog/g<CR>:4,5s/TODO/&(ada)/<CR>:7,$s/\\(\\w\\+\\) \\(\\w\\+\\)/\\2, \\1/<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

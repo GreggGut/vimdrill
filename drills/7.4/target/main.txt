@@ -1,0 +1,11 @@
+const a = 1;
+const b = 2;
+const c = a + b;
+const d = c * 2;
+const e = d - 1;
+const f = e / 3;
+const g = f + a;
+const h = g * b;
+
+// leave these alone
+// let x = 0

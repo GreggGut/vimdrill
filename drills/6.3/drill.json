@@ -1,0 +1,8 @@
+{
+  "id": "6.3",
+  "instructions": "1. On the \"# BEGIN legacy\" line set mark a (ma), hop to the blank line after END (}), and delete back to the mark (d'a).\n2. Set mark w on the workers line (mw), go change production to staging, then jump back with 'w and change 4 to 8.",
+  "solution": ":5<CR>ma}d'amw:3<CR>wwcwstaging<Esc>'w$r8",
+  "open": [
+    "main.txt"
+  ]
+}

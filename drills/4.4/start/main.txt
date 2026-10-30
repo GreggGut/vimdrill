@@ -1,0 +1,8 @@
+let cat = 1;
+let category = 2;
+let concat = cat + 3;
+// TODO: fix this
+// TODO: and this
+// TODO: keep this one as is
+John Smith
+Ada Lovelace

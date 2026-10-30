@@ -1,0 +1,10 @@
+server:
+  host: example.com
+  port: 8080
+  debug: false
+database:
+  host: example.com
+  port: 5432
+  user: app
+logging:
+  level: info

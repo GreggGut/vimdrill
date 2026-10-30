@@ -1,0 +1,11 @@
+{
+  "id": "9.3",
+  "instructions": "a.py, b.py and c.py are the argument list (:args).\n1. Rename fetch_data to load_data in all of them in one command:\n   :argdo %s/fetch_data/load_data/ge | update\n2. Open d.py in a new tab (:tabe d.py) and add a last line: print(load_data(\"d\"))\n3. gt back to the first tab (it now shows c.py) and add a last line: # checked\n4. :wa",
+  "solution": ":argdo %s/fetch_data/load_data/ge | update<CR>:tabe d.py<CR>Goprint(load_data(\"d\"))<Esc>gtGo# checked<Esc>:wa<CR>",
+  "open": [
+    "a.py",
+    "b.py",
+    "c.py"
+  ],
+  "diff": false
+}

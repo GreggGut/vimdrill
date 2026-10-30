@@ -1,0 +1,8 @@
+{
+  "id": "6.4",
+  "instructions": "1. Jump to the last line (G) and change FAIL to OK.\n2. Jump to the top (gg) and change draft to final.\n3. Go back through the jump list with Ctrl-o to the status line and append \" (verified)\".\n4. Go back through the change list with g; to the title line and append \" v2\".",
+  "solution": "G$ciwOK<Esc>gg$ciwfinal<Esc><C-o>A (verified)<Esc>g;g;A v2<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

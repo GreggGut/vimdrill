@@ -1,0 +1,5 @@
+color: rebeccapurple;
+background-color: #fafafa;
+border: 2px dashed black;
+font-family: Inter, sans-serif;
+padding: 8px;

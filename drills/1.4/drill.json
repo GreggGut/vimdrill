@@ -1,0 +1,8 @@
+{
+  "id": "1.4",
+  "instructions": "Fix every line without entering insert mode:\n1. Capitalize Hello and lowercase World (~).\n2. Join lines 2 and 3 (J).\n3. Lowercase FOR SHOUTING (try 3~ and 8~).\n4. Fix the caps-lock line in one go (g~~).\n5. Replace the commas with spaces (r).",
+  "solution": "~w~jJj0w3~w8~j0g~~j0wwwr<Space>wwr<Space>",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,10 @@
+ID,NAME,CITY
+1,alice,rome
+2,bob,paris
+3,carol,oslo
+
+version = 1.4.10
+retries = 5
+step 1: build
+step 2: test
+step 3: deploy

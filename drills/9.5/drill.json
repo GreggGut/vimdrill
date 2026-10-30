@@ -1,0 +1,10 @@
+{
+  "id": "9.5",
+  "instructions": "Review:\n1. Rename startServer to runServer across the Go files:\n   :vimgrep /startServer/ *.go then :cdo s/startServer/runServer/ | update\n2. :vs config.yaml, change the port to 9090, then close that window with Ctrl-w c.\n3. :b handlers and change TODO to listen.\n4. Ctrl-^ back to main.go and add a last line: // v2\n5. :wa",
+  "solution": ":vimgrep /startServer/ *.go<CR>:cdo s/startServer/runServer/ | update<CR>:vs config.yaml<CR>$ciw9090<Esc><C-w>c:b handlers<CR>/TODO<CR>cwlisten<Esc><C-^>Go// v2<Esc>:wa<CR>",
+  "open": [
+    "main.go",
+    "handlers.go"
+  ],
+  "diff": false
+}

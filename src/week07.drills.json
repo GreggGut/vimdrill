@@ -1,0 +1,57 @@
+[
+  {
+    "id": "7.1",
+    "instructions": "Turn every line into a JSON entry:  \"host\": \"localhost\",\n1. First add the { and } lines (before indenting anything, or o/O will copy the indent).\n2. Record the edit for the host line into register a (qa ... j q).\n3. Replay it on the other 9 lines (9@a, or @a then @@).",
+    "solution": "O{<Esc>Go}<Esc>ggjqa0i  \"<Esc>ea\":<Esc>wi\"<Esc>A\",<Esc>jq9@a",
+    "start": {
+      "main.txt": "host localhost\nport 5432\nuser admin\npassword secret\ndatabase shop\npool 10\ntimeout 30\nssl off\nretries 3\nschema public"
+    },
+    "target": {
+      "main.txt": "{\n  \"host\": \"localhost\",\n  \"port\": \"5432\",\n  \"user\": \"admin\",\n  \"password\": \"secret\",\n  \"database\": \"shop\",\n  \"pool\": \"10\",\n  \"timeout\": \"30\",\n  \"ssl\": \"off\",\n  \"retries\": \"3\",\n  \"schema\": \"public\",\n}"
+    }
+  },
+  {
+    "id": "7.2",
+    "instructions": "Mark only the ERROR lines: put \"* \" in front and \" [ticket]\" at the end.\nRecord a macro that STARTS by searching (/ERROR) so it finds its own target, then run it 4 more times.",
+    "solution": "qa/ERROR<CR>I* <Esc>A [ticket]<Esc>q4@a",
+    "start": {
+      "main.txt": "12:00:01 INFO  user login ok\n12:00:02 ERROR db timeout\n12:00:05 INFO  cache warm\n12:00:09 ERROR payment declined by bank\n12:00:10 INFO  user logout\n12:00:12 ERROR db timeout\n12:00:15 INFO  job started\n12:00:17 ERROR disk almost full\n12:00:20 INFO  job done\n12:00:21 ERROR mail bounce"
+    },
+    "target": {
+      "main.txt": "12:00:01 INFO  user login ok\n* 12:00:02 ERROR db timeout [ticket]\n12:00:05 INFO  cache warm\n* 12:00:09 ERROR payment declined by bank [ticket]\n12:00:10 INFO  user logout\n* 12:00:12 ERROR db timeout [ticket]\n12:00:15 INFO  job started\n* 12:00:17 ERROR disk almost full [ticket]\n12:00:20 INFO  job done\n* 12:00:21 ERROR mail bounce [ticket]"
+    }
+  },
+  {
+    "id": "7.3",
+    "instructions": "Turn every line into  export DB_HOST=localhost  (uppercase the name, prefix export).\nUse a recursive macro: clear it (qaq), record qa ... j@a q, then run @a once - it repeats until j fails on the last line.",
+    "solution": "qaqqa0gUt=Iexport <Esc>j@aq@a",
+    "start": {
+      "main.txt": "db_host=localhost\ndb_port=5432\ndb_user=app\napi_key=abc123\napi_url=https://api.example.com\nlog_level=info\ncache_ttl=300\nfeature_x=on\nfeature_y=off\nmail_host=smtp.example.com\nmail_port=587\ntimezone=UTC"
+    },
+    "target": {
+      "main.txt": "export DB_HOST=localhost\nexport DB_PORT=5432\nexport DB_USER=app\nexport API_KEY=abc123\nexport API_URL=https://api.example.com\nexport LOG_LEVEL=info\nexport CACHE_TTL=300\nexport FEATURE_X=on\nexport FEATURE_Y=off\nexport MAIL_HOST=smtp.example.com\nexport MAIL_PORT=587\nexport TIMEZONE=UTC"
+    }
+  },
+  {
+    "id": "7.4",
+    "instructions": "Fix the 8 let lines (not the comments) without recording interactively:\n1. Write a macro directly: :let @a='A;'  and run it on the block: vip then :norm @a\n2. Write a second one: :let @b='0cwconst'  and run it on the same block: gv then :norm @b",
+    "solution": ":let @a='A;'<CR>vip:norm @a<CR>:let @b='0cwconst'<CR>gv:norm @b<CR>",
+    "start": {
+      "main.txt": "let a = 1\nlet b = 2\nlet c = a + b\nlet d = c * 2\nlet e = d - 1\nlet f = e / 3\nlet g = f + a\nlet h = g * b\n\n// leave these alone\n// let x = 0"
+    },
+    "target": {
+      "main.txt": "const a = 1;\nconst b = 2;\nconst c = a + b;\nconst d = c * 2;\nconst e = d - 1;\nconst f = e / 3;\nconst g = f + a;\nconst h = g * b;\n\n// leave these alone\n// let x = 0"
+    }
+  },
+  {
+    "id": "7.5",
+    "instructions": "Review: turn the CSV into SQL.\n1. Delete the header line.\n2. Record a macro that turns 1,Alice,admin into  INSERT INTO users VALUES (1,'Alice','admin');  (f, is your friend) and moves down.\n3. Run it on the remaining rows.",
+    "solution": "ddqa0iINSERT INTO users VALUES (<Esc>f,a'<Esc>f,i'<Esc>la'<Esc>A');<Esc>jq7@a",
+    "start": {
+      "main.txt": "id,name,role\n1,Alice,admin\n2,Bob,dev\n3,Carol,dev\n4,Dave,ops\n5,Mary Ann,support\n6,Eve,security\n7,Frank,dev\n8,Grace,admin"
+    },
+    "target": {
+      "main.txt": "INSERT INTO users VALUES (1,'Alice','admin');\nINSERT INTO users VALUES (2,'Bob','dev');\nINSERT INTO users VALUES (3,'Carol','dev');\nINSERT INTO users VALUES (4,'Dave','ops');\nINSERT INTO users VALUES (5,'Mary Ann','support');\nINSERT INTO users VALUES (6,'Eve','security');\nINSERT INTO users VALUES (7,'Frank','dev');\nINSERT INTO users VALUES (8,'Grace','admin');"
+    }
+  }
+]

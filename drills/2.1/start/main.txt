@@ -1,0 +1,10 @@
+def total(items, debug_flag):
+    result = 0  # TODO remove this comment
+    for item in items:
+        print("debug", item)
+        result += item.price
+    return result
+
+# old code
+print(total([]))
+print("done")

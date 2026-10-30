@@ -1,0 +1,8 @@
+{
+  "id": "2.4",
+  "instructions": "Counts and the dot command:\n1. Add ; to the end of the first let line, then use j and . for the other three.\n2. Delete the three DEBUG lines in one go (3dd).\n3. Delete the three OLD words in one go (d3w).",
+  "solution": "A;<Esc>j.j.j.j3dd0wwd3w",
+  "open": [
+    "main.txt"
+  ]
+}

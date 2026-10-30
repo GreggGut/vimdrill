@@ -1,0 +1,12 @@
+db_host=localhost
+db_port=5432
+db_user=app
+api_key=abc123
+api_url=https://api.example.com
+log_level=info
+cache_ttl=300
+feature_x=on
+feature_y=off
+mail_host=smtp.example.com
+mail_port=587
+timezone=UTC

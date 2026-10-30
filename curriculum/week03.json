@@ -1,0 +1,298 @@
+{
+  "week": 3,
+  "title": "Precision",
+  "goal": "Land on the exact character with f/t, and operate on meaningful chunks with text objects.",
+  "lessons": [
+    {
+      "id": "3.1",
+      "title": "Find on the line: f t F T",
+      "concepts": [
+        {
+          "keys": "f{c} / F{c}",
+          "desc": "jump to the next / previous character c on the line."
+        },
+        {
+          "keys": "t{c} / T{c}",
+          "desc": "jump to just before / just after the next / previous c."
+        },
+        {
+          "keys": "{count}f{c}",
+          "desc": "jump to the count-th c: 2f, = second comma."
+        },
+        {
+          "keys": "case",
+          "desc": "f/t are case-sensitive, regardless of ignorecase."
+        }
+      ],
+      "tip": "Look at the character you want, then f it. Pick rare characters (quotes, brackets, digits) for one-hit jumps.",
+      "quiz": [
+        {
+          "id": "3.1-q1",
+          "q": "Jump to the next ( on the line?",
+          "a": "f("
+        },
+        {
+          "id": "3.1-q2",
+          "q": "What's the difference between f) and t)?",
+          "a": "f) lands on the ), t) lands on the character just before it."
+        },
+        {
+          "id": "3.1-q3",
+          "q": "Jump backward to the previous comma?",
+          "a": "F,"
+        },
+        {
+          "id": "3.1-q4",
+          "q": "Cursor at end of path/to/file.sh - put the cursor right after the dot?",
+          "a": "T."
+        },
+        {
+          "id": "3.1-q5",
+          "q": "Jump to the third x on the line?",
+          "a": "3fx"
+        },
+        {
+          "id": "3.1-q6",
+          "q": "Does f search into the next line?",
+          "a": "No, f/t/F/T only work within the current line."
+        }
+      ]
+    },
+    {
+      "id": "3.2",
+      "title": "; , and f/t with operators",
+      "concepts": [
+        {
+          "keys": ";",
+          "desc": "repeat the last f/t/F/T in the same direction."
+        },
+        {
+          "keys": ",",
+          "desc": "repeat it in the opposite direction."
+        },
+        {
+          "keys": "dt{c} / ct{c}",
+          "desc": "delete / change up to (not including) c: dt), ct\"."
+        },
+        {
+          "keys": "df{c} / cf{c}",
+          "desc": "delete / change up to and including c."
+        },
+        {
+          "keys": "dT{c} / dF{c}",
+          "desc": "the same, backward."
+        }
+      ],
+      "tip": "ct\" and dt) are some of the most-used commands in all of vim. Arguments, strings, paths: change up to the delimiter.",
+      "quiz": [
+        {
+          "id": "3.2-q1",
+          "q": "Delete up to but not including the next )?",
+          "a": "dt)"
+        },
+        {
+          "id": "3.2-q2",
+          "q": "Change up to and including the next comma?",
+          "a": "cf,"
+        },
+        {
+          "id": "3.2-q3",
+          "q": "You did f, and overshot. Go back to the previous comma?",
+          "a": ","
+        },
+        {
+          "id": "3.2-q4",
+          "q": "Repeat the last f in the same direction?",
+          "a": ";"
+        },
+        {
+          "id": "3.2-q5",
+          "q": "What does dT/ do?",
+          "a": "Deletes backward up to (not including) the previous /."
+        },
+        {
+          "id": "3.2-q6",
+          "q": "Change the rest of a string up to the closing quote?",
+          "a": "ct\""
+        }
+      ]
+    },
+    {
+      "id": "3.3",
+      "title": "Word and quote text objects",
+      "concepts": [
+        {
+          "keys": "iw / aw",
+          "desc": "inner word / a word (with surrounding space): ciw, daw."
+        },
+        {
+          "keys": "iW / aW",
+          "desc": "the same for WORDs."
+        },
+        {
+          "keys": "i\" / a\"",
+          "desc": "inside / around double quotes. Works even if the cursor is before the quotes on the line."
+        },
+        {
+          "keys": "i' / i`",
+          "desc": "inside single quotes / backticks."
+        },
+        {
+          "keys": "{op}{i|a}{obj}",
+          "desc": "text objects only work after an operator or in visual mode: ciw, yi\", da'."
+        }
+      ],
+      "tip": "Text objects don't care where in the word or string the cursor is. ciw works from the middle of a word; cw doesn't.",
+      "quiz": [
+        {
+          "id": "3.3-q1",
+          "q": "Change the whole word under the cursor, from anywhere in it?",
+          "a": "ciw"
+        },
+        {
+          "id": "3.3-q2",
+          "q": "Delete a word and the space after it?",
+          "a": "daw"
+        },
+        {
+          "id": "3.3-q3",
+          "q": "Replace the contents of a double-quoted string?",
+          "a": "ci\""
+        },
+        {
+          "id": "3.3-q4",
+          "q": "Difference between di\" and da\"?",
+          "a": "di\" deletes the text inside the quotes; da\" also deletes the quotes (and trailing space)."
+        },
+        {
+          "id": "3.3-q5",
+          "q": "Yank a whole path like src/app/main.ts with the cursor in the middle?",
+          "a": "yiW"
+        },
+        {
+          "id": "3.3-q6",
+          "q": "Can you use iw as a plain motion (just iw in normal mode)?",
+          "a": "No, text objects only work after an operator or in visual mode."
+        }
+      ]
+    },
+    {
+      "id": "3.4",
+      "title": "Bracket, tag and paragraph objects",
+      "concepts": [
+        {
+          "keys": "i( / a( (ib / ab)",
+          "desc": "inside / around parentheses."
+        },
+        {
+          "keys": "i{ / a{ (iB / aB)",
+          "desc": "inside / around braces."
+        },
+        {
+          "keys": "i[ / i<",
+          "desc": "inside brackets / angle brackets."
+        },
+        {
+          "keys": "it / at",
+          "desc": "inside / around an XML/HTML tag."
+        },
+        {
+          "keys": "ip / ap",
+          "desc": "inner paragraph / a paragraph including the following blank line."
+        }
+      ],
+      "tip": "di( and ci{ work from anywhere inside the brackets, even across lines. Use them for arguments and function bodies.",
+      "quiz": [
+        {
+          "id": "3.4-q1",
+          "q": "Delete all arguments of the function call the cursor is inside?",
+          "a": "di( (or dib)"
+        },
+        {
+          "id": "3.4-q2",
+          "q": "Change the contents of an HTML tag?",
+          "a": "cit"
+        },
+        {
+          "id": "3.4-q3",
+          "q": "Delete a paragraph and the blank line after it?",
+          "a": "dap"
+        },
+        {
+          "id": "3.4-q4",
+          "q": "Delete a {...} block including the braces?",
+          "a": "da{ (or daB)"
+        },
+        {
+          "id": "3.4-q5",
+          "q": "Yank the inside of [ ]?",
+          "a": "yi["
+        },
+        {
+          "id": "3.4-q6",
+          "q": "What does vip do?",
+          "a": "Visually selects the inner paragraph."
+        }
+      ]
+    },
+    {
+      "id": "3.5",
+      "title": "Week 3 review",
+      "concepts": [
+        {
+          "keys": "f t F T ; ,",
+          "desc": "find on the line"
+        },
+        {
+          "keys": "dt ct df cf",
+          "desc": "operate up to a character"
+        },
+        {
+          "keys": "iw aw iW",
+          "desc": "word objects"
+        },
+        {
+          "keys": "i\" i' i`",
+          "desc": "quote objects"
+        },
+        {
+          "keys": "i( i{ i[ it ip",
+          "desc": "block objects"
+        }
+      ],
+      "tip": "Whenever you're about to press w or l more than twice, ask: is there an f or a text object for this?",
+      "quiz": [
+        {
+          "id": "3.5-q1",
+          "q": "Change the second argument of foo(a, b) with the cursor on b?",
+          "a": "ciw (or ct))"
+        },
+        {
+          "id": "3.5-q2",
+          "q": "Delete everything inside a JSON object {...}?",
+          "a": "di{"
+        },
+        {
+          "id": "3.5-q3",
+          "q": "Change up to the next semicolon?",
+          "a": "ct;"
+        },
+        {
+          "id": "3.5-q4",
+          "q": "Delete a quoted string including the quotes?",
+          "a": "da\""
+        },
+        {
+          "id": "3.5-q5",
+          "q": "Jump to the next = and then the one after it?",
+          "a": "f= then ;"
+        },
+        {
+          "id": "3.5-q6",
+          "q": "Select the whole tag including <p> and </p>?",
+          "a": "vat"
+        }
+      ]
+    }
+  ]
+}

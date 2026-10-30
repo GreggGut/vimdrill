@@ -1,0 +1,111 @@
+{
+  "week": 1,
+  "title": "Moving in big steps",
+  "goal": "Get anywhere on a line or in a file in a few keystrokes, and insert exactly where you mean to.",
+  "lessons": [
+    {
+      "id": "1.1",
+      "title": "Word and line motions",
+      "concepts": [
+        {"keys": "← ↓ ↑ →", "desc": "one character or line at a time. Vim also maps these to h j k l; arrows work just as well. The goal this week is to need them less."},
+        {"keys": "w / b / e", "desc": "next word start / previous word start / end of word. Punctuation counts as its own word."},
+        {"keys": "W / B / E", "desc": "the same for WORDS: anything between spaces (foo.bar(baz) is one WORD)."},
+        {"keys": "ge", "desc": "back to the end of the previous word."},
+        {"keys": "0 / ^ / $", "desc": "line start / first non-blank character / line end."},
+        {"keys": "x", "desc": "delete the character under the cursor."}
+      ],
+      "tip": "If you press ← or → more than twice in a row, stop: there's a word motion that gets you there faster.",
+      "quiz": [
+        {"id": "1.1-q1", "q": "Cursor at the start of `foo.bar(baz) next`. Which single key jumps straight to `next`?", "a": "W (WORD motion skips punctuation-separated parts)."},
+        {"id": "1.1-q2", "q": "What's the difference between `0` and `^`?", "a": "0 goes to column 0; ^ goes to the first non-blank character (they differ on indented lines)."},
+        {"id": "1.1-q3", "q": "Which key moves to the end of the current/next word?", "a": "e (E for WORD)."},
+        {"id": "1.1-q4", "q": "How many `w` presses from the start of `a.b c` to reach `c`?", "a": "3 (a, ., b and c are separate words: w lands on ., then b, then c)."},
+        {"id": "1.1-q5", "q": "Which key goes back to the start of the previous WORD?", "a": "B"},
+        {"id": "1.1-q6", "q": "Cursor anywhere on a line: how do you get to the last character?", "a": "$"}
+      ]
+    },
+    {
+      "id": "1.2",
+      "title": "Insert where you mean",
+      "concepts": [
+        {"keys": "i / a", "desc": "insert before / append after the cursor."},
+        {"keys": "I / A", "desc": "insert at the first non-blank / append at the end of the line, from anywhere on it."},
+        {"keys": "o / O", "desc": "open a new line below / above and enter insert mode."},
+        {"keys": "gi", "desc": "resume inserting where you last left insert mode. Use it when you stop typing to fix or check something elsewhere: gi takes you back, in insert mode, from wherever you are."},
+        {"keys": "Ctrl-w / Ctrl-u (insert)", "desc": "delete the word / everything typed on the line, without leaving insert mode."}
+      ],
+      "tip": "Never do `$a` or `0i`: A and I do it in one key. Never do `j0i<CR>`: that's what O and o are for.",
+      "quiz": [
+        {"id": "1.2-q1", "q": "From the middle of a line, which key appends at the end of the line?", "a": "A"},
+        {"id": "1.2-q2", "q": "How do you add a new line above the current one and start typing?", "a": "O"},
+        {"id": "1.2-q3", "q": "What does `I` do on an indented line?", "a": "Inserts before the first non-blank character (after the indentation)."},
+        {"id": "1.2-q4", "q": "What does `gi` do?", "a": "Goes back to where you last left insert mode and enters insert mode there."},
+        {"id": "1.2-q5", "q": "In insert mode, you typed a wrong word. Which key deletes it without leaving insert mode?", "a": "Ctrl-w"},
+        {"id": "1.2-q6", "q": "Difference between `i` and `a`?", "a": "i inserts before the cursor character, a after it."}
+      ]
+    },
+    {
+      "id": "1.3",
+      "title": "Big jumps through a file",
+      "concepts": [
+        {"keys": "gg / G", "desc": "first line / last line."},
+        {"keys": ":N<CR> or NG", "desc": "go to line N (e.g. :42 or 42G)."},
+        {"keys": "{ / }", "desc": "previous / next blank line (paragraph boundary)."},
+        {"keys": "Ctrl-d / Ctrl-u", "desc": "scroll half a page down / up."},
+        {"keys": "H / M / L", "desc": "top / middle / bottom of the visible screen."},
+        {"keys": "zz / zt / zb", "desc": "scroll so the cursor line is centered / at top / at bottom."},
+        {"keys": "%", "desc": "jump to the matching ( ) [ ] { }."}
+      ],
+      "tip": "Holding ↓ to scroll is a slow mouse wheel. Use } to hop by block, Ctrl-d to page, :N when you can see the line number.",
+      "quiz": [
+        {"id": "1.3-q1", "q": "How do you jump to line 120?", "a": ":120<CR> or 120G"},
+        {"id": "1.3-q2", "q": "What does `}` do?", "a": "Moves to the next blank line (end of the paragraph/block)."},
+        {"id": "1.3-q3", "q": "Cursor on a `{` - which key jumps to its matching `}`?", "a": "%"},
+        {"id": "1.3-q4", "q": "How do you scroll half a page down?", "a": "Ctrl-d"},
+        {"id": "1.3-q5", "q": "The cursor line is at the bottom of the screen and you want it in the middle. Which keys?", "a": "zz"},
+        {"id": "1.3-q6", "q": "Which key moves the cursor to the top line visible on screen?", "a": "H"}
+      ]
+    },
+    {
+      "id": "1.4",
+      "title": "Small fixes, undo and redo",
+      "concepts": [
+        {"keys": "r{c}", "desc": "replace the character under the cursor with c (stays in normal mode)."},
+        {"keys": "~", "desc": "toggle case of the character and move right. A count works: 3~."},
+        {"keys": "g~~ / gUU / guu", "desc": "toggle / upper / lower case of the whole line."},
+        {"keys": "J", "desc": "join the next line onto this one, fixing up the whitespace."},
+        {"keys": "x / X", "desc": "delete the character under / before the cursor."},
+        {"keys": "u / Ctrl-r", "desc": "undo / redo. Each insert session is one undo step."},
+        {"keys": "count prefix", "desc": "most commands take a count: 3x, 5j, 2w, 8~."}
+      ],
+      "tip": "Leave insert mode often. Every insert session is one undo step, so short inserts make undo precise.",
+      "quiz": [
+        {"id": "1.4-q1", "q": "How do you change a single `a` into `o` without entering insert mode?", "a": "ro"},
+        {"id": "1.4-q2", "q": "What does `J` do?", "a": "Joins the next line to the current one, replacing the line break and leading whitespace with one space."},
+        {"id": "1.4-q3", "q": "Redo after an undo?", "a": "Ctrl-r"},
+        {"id": "1.4-q4", "q": "Uppercase the whole current line?", "a": "gUU (or gUgU)"},
+        {"id": "1.4-q5", "q": "Delete the next 4 characters?", "a": "4x"},
+        {"id": "1.4-q6", "q": "What exactly does one `u` undo after you typed a sentence in insert mode?", "a": "The whole insert session (everything typed between entering and leaving insert mode)."}
+      ]
+    },
+    {
+      "id": "1.5",
+      "title": "Week 1 review",
+      "concepts": [
+        {"keys": "w b e W B E 0 ^ $", "desc": "line motions"},
+        {"keys": "i a I A o O", "desc": "inserts"},
+        {"keys": "gg G :N { } %", "desc": "file motions"},
+        {"keys": "x r ~ J u Ctrl-r", "desc": "small fixes"}
+      ],
+      "tip": "Do the drill twice: once to solve it, once to get under par.",
+      "quiz": [
+        {"id": "1.5-q1", "q": "Append `;` to the end of the current line, in the fewest keys.", "a": "A;<Esc>"},
+        {"id": "1.5-q2", "q": "Go to the last line and add a new line below it.", "a": "Go"},
+        {"id": "1.5-q3", "q": "Cursor at line start: reach the second WORD.", "a": "W"},
+        {"id": "1.5-q4", "q": "Join three lines into one.", "a": "3J (or JJ)"},
+        {"id": "1.5-q5", "q": "Jump to the next paragraph, then the previous one.", "a": "} then {"},
+        {"id": "1.5-q6", "q": "Make the character under the cursor uppercase if it's lowercase.", "a": "~"}
+      ]
+    }
+  ]
+}

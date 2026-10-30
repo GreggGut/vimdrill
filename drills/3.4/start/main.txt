@@ -1,0 +1,9 @@
+result = compute(alpha, beta, gamma)
+config = { debug: true, verbose: true }
+matrix = [[1, 2], [3, 4]]
+<p>Old <b>bold</b> text</p>
+
+Delete this whole
+paragraph please.
+
+Keep this one.

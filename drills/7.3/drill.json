@@ -1,0 +1,8 @@
+{
+  "id": "7.3",
+  "instructions": "Turn every line into  export DB_HOST=localhost  (uppercase the name, prefix export).\nUse a recursive macro: clear it (qaq), record qa ... j@a q, then run @a once - it repeats until j fails on the last line.",
+  "solution": "qaqqa0gUt=Iexport <Esc>j@aq@a",
+  "open": [
+    "main.txt"
+  ]
+}

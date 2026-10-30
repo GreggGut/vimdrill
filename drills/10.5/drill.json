@@ -1,0 +1,8 @@
+{
+  "id": "10.5",
+  "instructions": "Turn this leftover Vimscript into Lua: every `set` line into vim.opt, and the two\nnnoremap lines into vim.keymap.set. Aim for three :s commands, not 9 line edits.\n  set foo      -> vim.opt.foo = true\n  set foo=val  -> vim.opt.foo = val\n  nnoremap L R -> vim.keymap.set('n', 'L', 'R')\nHint: \\(\\w\\+\\) captures a word, \\(\\S\\+\\) captures non-space, \\1 \\2 reuse them.",
+  "solution": ":%s/^set \\(\\w\\+\\)$/vim.opt.\\1 = true/<CR>:%s/^set \\(\\w\\+\\)=\\(.*\\)/vim.opt.\\1 = \\2/<CR>:%s/^nnoremap \\(\\S\\+\\) \\(.*\\)/vim.keymap.set('n', '\\1', '\\2')/<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

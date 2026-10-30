@@ -1,0 +1,8 @@
+{
+  "id": "8.5",
+  "instructions": "Review:\n1. Sort the five task lines (TODOs end up first): :2,6sort\n2. Append \" !\" to the three TODO lines with :norm over a range.\n3. Copy the version line to the very top (:$t0), then prefix that copy with \"# previous \".\n4. Bump the version at the bottom to 2.0.10 with Ctrl-a.",
+  "solution": ":2,6sort<CR>:2,4norm A !<CR>:$t0<CR>:1s/^/# previous /<CR>G$<C-a>",
+  "open": [
+    "main.txt"
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "week": 6,
+  "title": "Registers and marks",
+  "goal": "Keep several pieces of text at hand without losing them, and jump back to places you've been.",
+  "lessons": [
+    {
+      "id": "6.1",
+      "title": "Named registers and the yank register",
+      "concepts": [
+        {"keys": "\"ayy / \"ap", "desc": "yank into / put from register a (any of a-z)."},
+        {"keys": "\"Ayy", "desc": "uppercase name: APPEND to register a instead of overwriting it."},
+        {"keys": "\"0", "desc": "the yank register: holds your last yank, even after you delete things."},
+        {"keys": "\"1-\"9", "desc": "the last nine deleted lines; each new line delete shifts them down."},
+        {"keys": "\"\"", "desc": "the unnamed register used by plain y, d, c, p."},
+        {"keys": ":reg / :reg a", "desc": "show register contents."}
+      ],
+      "tip": "Classic trap: yank a word, delete the text to replace, press p, and you get the deleted text back. Use \"0p. Your config uses clipboard=unnamedplus, so plain y/p go through the system clipboard; named registers always behave the same.",
+      "quiz": [
+        {"id": "6.1-q1", "q": "You yanked a line, then deleted another one. How do you paste the yanked line?", "a": "\"0p"},
+        {"id": "6.1-q2", "q": "Yank the current line into register q.", "a": "\"qyy"},
+        {"id": "6.1-q3", "q": "Add the current line to what's already in register q.", "a": "\"Qyy"},
+        {"id": "6.1-q4", "q": "How do you see what's in all registers?", "a": ":reg (or :registers)"},
+        {"id": "6.1-q5", "q": "What's in register \"1?", "a": "The most recently deleted (or changed) line(s); older ones shift to \"2-\"9."},
+        {"id": "6.1-q6", "q": "Put register b above the cursor line.", "a": "\"bP"}
+      ]
+    },
+    {
+      "id": "6.2",
+      "title": "Special registers and Ctrl-r",
+      "concepts": [
+        {"keys": "\"_d", "desc": "black hole register: delete without overwriting any register."},
+        {"keys": "\"+ / \"*", "desc": "system clipboard / primary selection (needs a clipboard provider; in WSL install win32yank)."},
+        {"keys": "Ctrl-r {reg}", "desc": "in insert or command-line mode: insert a register's contents."},
+        {"keys": "Ctrl-r =", "desc": "expression register: type math or a Vim expression, Enter inserts the result."},
+        {"keys": "\". \": \"% \"/", "desc": "last inserted text / last command / current file name / last search."},
+        {"keys": "Ctrl-r Ctrl-w", "desc": "on the command line: insert the word under the cursor."}
+      ],
+      "tip": "Ctrl-r is the fastest way to reuse text while typing: Ctrl-r 0 pastes your yank, Ctrl-r / your last search, Ctrl-r = does sums.",
+      "quiz": [
+        {"id": "6.2-q1", "q": "Delete a line without touching any register.", "a": "\"_dd"},
+        {"id": "6.2-q2", "q": "In insert mode, paste the contents of register a.", "a": "Ctrl-r a"},
+        {"id": "6.2-q3", "q": "Insert the result of 24*7 while typing.", "a": "Ctrl-r =24*7<CR>"},
+        {"id": "6.2-q4", "q": "Which register holds the current file name?", "a": "\"%"},
+        {"id": "6.2-q5", "q": "Yank the current line to the system clipboard.", "a": "\"+yy"},
+        {"id": "6.2-q6", "q": "While typing a :s command, how do you insert the word under the cursor?", "a": "Ctrl-r Ctrl-w"}
+      ]
+    },
+    {
+      "id": "6.3",
+      "title": "Marks",
+      "concepts": [
+        {"keys": "m{a-z}", "desc": "set a mark in this file."},
+        {"keys": "'a / `a", "desc": "jump to the line of mark a / its exact position."},
+        {"keys": "d'a / y`a", "desc": "marks are motions: delete to the mark line, yank to the exact mark."},
+        {"keys": "m{A-Z}", "desc": "uppercase marks are global: 'A opens the file and jumps there."},
+        {"keys": "'' / ``", "desc": "back to where you were before the last jump."},
+        {"keys": ":marks", "desc": "list the marks."}
+      ],
+      "tip": "Set a mark before you go elsewhere to look something up (ma), then come back with `a. For a one-off, `` (back to before the jump) needs no mark.",
+      "quiz": [
+        {"id": "6.3-q1", "q": "Set mark x here, and later jump to its exact column.", "a": "mx, then `x"},
+        {"id": "6.3-q2", "q": "Delete everything from the current line up to the line with mark a.", "a": "d'a"},
+        {"id": "6.3-q3", "q": "What's special about mark `B` (uppercase)?", "a": "It's global: it remembers the file too, so 'B jumps across files."},
+        {"id": "6.3-q4", "q": "Difference between 'a and `a?", "a": "'a goes to the first non-blank of the mark's line; `a goes to the exact line and column."},
+        {"id": "6.3-q5", "q": "Return to where you were before your last G or search jump.", "a": "`` (or '' for the line)"},
+        {"id": "6.3-q6", "q": "List all marks.", "a": ":marks"}
+      ]
+    },
+    {
+      "id": "6.4",
+      "title": "Jump list and change list",
+      "concepts": [
+        {"keys": "Ctrl-o / Ctrl-i", "desc": "back / forward through the jump list (G, gg, /search, %, marks... are jumps). Works across files."},
+        {"keys": "g; / g,", "desc": "back / forward through the places you changed text."},
+        {"keys": "`.", "desc": "jump to the last change."},
+        {"keys": "`[ / `]", "desc": "start / end of the last changed or yanked text (e.g. what you just pasted)."},
+        {"keys": "gi", "desc": "back into insert mode where you last left it."},
+        {"keys": ":jumps / :changes", "desc": "show the lists."}
+      ],
+      "tip": "Ctrl-o is your back button. After jumping to a definition or a search result, Ctrl-o brings you back, even into the previous file.",
+      "quiz": [
+        {"id": "6.4-q1", "q": "You searched and jumped away. How do you go back to where you were?", "a": "Ctrl-o (or ``)"},
+        {"id": "6.4-q2", "q": "Jump to where you last changed text.", "a": "`. (or g;)"},
+        {"id": "6.4-q3", "q": "Difference between Ctrl-o and g;?", "a": "Ctrl-o walks the jump list (places you jumped from); g; walks the change list (places you edited)."},
+        {"id": "6.4-q4", "q": "Select exactly the text you just pasted.", "a": "`[v`]"},
+        {"id": "6.4-q5", "q": "Is j a jump that Ctrl-o returns from?", "a": "No. Only jump motions (G, gg, /, n, %, marks, etc.) go in the jump list."},
+        {"id": "6.4-q6", "q": "Move forward again after pressing Ctrl-o too often.", "a": "Ctrl-i (Tab)"}
+      ]
+    },
+    {
+      "id": "6.5",
+      "title": "Week 6 review",
+      "concepts": [
+        {"keys": "\"a-\"z \"A \"0 \"_ \"+", "desc": "registers"},
+        {"keys": "Ctrl-r {reg} / Ctrl-r =", "desc": "insert registers or results while typing"},
+        {"keys": "m 'a `a '' ``", "desc": "marks"},
+        {"keys": "Ctrl-o Ctrl-i g; g, `.", "desc": "jump and change lists"}
+      ],
+      "tip": "Collect, then place: yank several things into different registers first, then paste them where they belong in one pass.",
+      "quiz": [
+        {"id": "6.5-q1", "q": "Paste your last yank after deleting something else.", "a": "\"0p"},
+        {"id": "6.5-q2", "q": "Collect three separate lines into one register.", "a": "\"ayy on the first, \"Ayy on the others"},
+        {"id": "6.5-q3", "q": "Replace the current word with the yank register without losing it.", "a": "ciw then Ctrl-r 0 (or viw\"0p)"},
+        {"id": "6.5-q4", "q": "Go back to the place of your last edit.", "a": "`. or g;"},
+        {"id": "6.5-q5", "q": "Yank from the cursor to mark a (exact position).", "a": "y`a"},
+        {"id": "6.5-q6", "q": "Delete a line with dd but keep the unnamed register intact.", "a": "\"_dd"}
+      ]
+    }
+  ]
+}

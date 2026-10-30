@@ -1,0 +1,8 @@
+{
+  "id": "1.5",
+  "instructions": "Review: make the left side match the right.\n- Capitalize the two headings.\n- Put \"- \" in front of the shopping items and add \"- coffee\".\n- Fix bikee.\n- Add a last line: done.",
+  "solution": "w~jI- <Esc>jI- <Esc>jI- <Esc>o- coffee<Esc>jj0w~jj$xGodone.<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

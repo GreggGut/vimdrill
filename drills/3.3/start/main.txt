@@ -1,0 +1,5 @@
+name = "John Smith"
+greeting = 'Good morning'
+cmd = "rm -rf build"
+The the quick brown fox
+path = config.paths.output_dir

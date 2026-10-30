@@ -1,0 +1,8 @@
+{
+  "id": "2.3",
+  "instructions": "Yank and put:\n1. Fix teh -> the by swapping two letters (xp).\n2. Swap the Second/First step lines (ddp).\n3. Duplicate the Third step line (yyp) and change the copy to Fourth.\n4. Yank the word localhost (yw) and put it between the empty quotes on the last line (P).",
+  "solution": "lxpjddpjyypwcwFourth<Esc>j0wwwywjj$P",
+  "open": [
+    "main.txt"
+  ]
+}

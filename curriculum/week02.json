@@ -1,0 +1,306 @@
+{
+  "week": 2,
+  "title": "Operator grammar",
+  "goal": "Think in verb + motion: d, c and y combine with every motion you know, and . repeats the last change.",
+  "lessons": [
+    {
+      "id": "2.1",
+      "title": "Delete with d + motion",
+      "concepts": [
+        {
+          "keys": "d{motion}",
+          "desc": "delete over any motion: dw, de, db, d$, d0, dG, dgg, d}."
+        },
+        {
+          "keys": "dd",
+          "desc": "delete the whole line (operator doubled = act on the line)."
+        },
+        {
+          "keys": "D",
+          "desc": "delete to the end of the line (same as d$)."
+        },
+        {
+          "keys": "dw vs de",
+          "desc": "dw also eats the space after the word; de stops at the end of the word."
+        },
+        {
+          "keys": "dG / dgg",
+          "desc": "delete to the end / start of the file, linewise."
+        }
+      ],
+      "tip": "Say it out loud: 'delete to end of word' = de. Every motion from week 1 is now a delete command.",
+      "quiz": [
+        {
+          "id": "2.1-q1",
+          "q": "Delete from the cursor to the end of the line?",
+          "a": "D (or d$)"
+        },
+        {
+          "id": "2.1-q2",
+          "q": "What's the difference between dw and de?",
+          "a": "dw deletes to the start of the next word (including trailing space); de deletes to the end of the current word."
+        },
+        {
+          "id": "2.1-q3",
+          "q": "Delete from the current line to the end of the file?",
+          "a": "dG"
+        },
+        {
+          "id": "2.1-q4",
+          "q": "What does d} do?",
+          "a": "Deletes from the cursor to the next blank line (end of the paragraph)."
+        },
+        {
+          "id": "2.1-q5",
+          "q": "Delete the word before the cursor?",
+          "a": "db"
+        },
+        {
+          "id": "2.1-q6",
+          "q": "What does dd do?",
+          "a": "Deletes the whole current line."
+        }
+      ]
+    },
+    {
+      "id": "2.2",
+      "title": "Change with c + motion",
+      "concepts": [
+        {
+          "keys": "c{motion}",
+          "desc": "delete over a motion and enter insert mode: cw, c$, cb, c0."
+        },
+        {
+          "keys": "cw",
+          "desc": "special case: behaves like ce (doesn't eat the trailing space)."
+        },
+        {
+          "keys": "cc / S",
+          "desc": "change the whole line (keeps indentation with autoindent)."
+        },
+        {
+          "keys": "C",
+          "desc": "change to the end of the line (same as c$)."
+        },
+        {
+          "keys": "s",
+          "desc": "substitute one character: delete it and enter insert mode."
+        }
+      ],
+      "tip": "c is 'd, then i' in one go, and it's a single undoable, repeatable change. Prefer cw over dwi.",
+      "quiz": [
+        {
+          "id": "2.2-q1",
+          "q": "Replace the current word from the cursor onward?",
+          "a": "cw (or ce)"
+        },
+        {
+          "id": "2.2-q2",
+          "q": "Replace the rest of the line?",
+          "a": "C (or c$)"
+        },
+        {
+          "id": "2.2-q3",
+          "q": "What does cc do?",
+          "a": "Deletes the line's text and enters insert mode on it."
+        },
+        {
+          "id": "2.2-q4",
+          "q": "Difference between s and r?",
+          "a": "s deletes the character and enters insert mode; r replaces it with one character and stays in normal mode."
+        },
+        {
+          "id": "2.2-q5",
+          "q": "Why is cw not the same as dwi?",
+          "a": "cw acts like ce and keeps the space after the word; it's also a single repeatable change."
+        },
+        {
+          "id": "2.2-q6",
+          "q": "What does S do?",
+          "a": "Same as cc: change the whole line."
+        }
+      ]
+    },
+    {
+      "id": "2.3",
+      "title": "Yank and put",
+      "concepts": [
+        {
+          "keys": "y{motion} / yy",
+          "desc": "yank (copy) over a motion / the whole line."
+        },
+        {
+          "keys": "p / P",
+          "desc": "put after / before the cursor (below / above for whole lines)."
+        },
+        {
+          "keys": "xp",
+          "desc": "swap two characters."
+        },
+        {
+          "keys": "ddp / ddP",
+          "desc": "move a line down / up (swap with the next line)."
+        },
+        {
+          "keys": "yyp",
+          "desc": "duplicate a line."
+        },
+        {
+          "keys": "Y",
+          "desc": "yank to the end of the line in Neovim (y$)."
+        }
+      ],
+      "tip": "Deleting also yanks: d and x are 'cut'. That's why xp and ddp work.",
+      "quiz": [
+        {
+          "id": "2.3-q1",
+          "q": "Duplicate the current line?",
+          "a": "yyp"
+        },
+        {
+          "id": "2.3-q2",
+          "q": "Swap the current line with the one below?",
+          "a": "ddp"
+        },
+        {
+          "id": "2.3-q3",
+          "q": "Fix 'teh' with the cursor on 'e'?",
+          "a": "xp"
+        },
+        {
+          "id": "2.3-q4",
+          "q": "Difference between p and P for a yanked line?",
+          "a": "p puts it below the current line, P above."
+        },
+        {
+          "id": "2.3-q5",
+          "q": "Copy the word under the cursor from its start?",
+          "a": "yw (or yiw from anywhere in it)"
+        },
+        {
+          "id": "2.3-q6",
+          "q": "Does dd put the line in a register?",
+          "a": "Yes, deletes are yanked into the unnamed register, so p puts it back."
+        }
+      ]
+    },
+    {
+      "id": "2.4",
+      "title": "Counts and the dot command",
+      "concepts": [
+        {
+          "keys": "{count}{op}{motion}",
+          "desc": "d3w, 3dd, 2yy, c2w: counts multiply motions."
+        },
+        {
+          "keys": "{op}{count}{motion}",
+          "desc": "d3w and 3dw do the same thing."
+        },
+        {
+          "keys": ".",
+          "desc": "repeat the last change (including the text typed in an insert)."
+        },
+        {
+          "keys": "{count}.",
+          "desc": "repeat the last change count times."
+        },
+        {
+          "keys": "A;<Esc> then j.",
+          "desc": "the classic pattern: make one change, then move and dot."
+        }
+      ],
+      "tip": "Design changes to be repeatable: one change, then . everywhere else. If you're retyping something, you probably wanted the dot.",
+      "quiz": [
+        {
+          "id": "2.4-q1",
+          "q": "Delete the next three lines including this one?",
+          "a": "3dd"
+        },
+        {
+          "id": "2.4-q2",
+          "q": "What does . repeat?",
+          "a": "The last change: the operator + motion, or the whole insert including the typed text."
+        },
+        {
+          "id": "2.4-q3",
+          "q": "Delete three words?",
+          "a": "d3w (or 3dw)"
+        },
+        {
+          "id": "2.4-q4",
+          "q": "You appended ; to one line with A;<Esc>. How do you do the next line?",
+          "a": "j. (or ↓.)"
+        },
+        {
+          "id": "2.4-q5",
+          "q": "Yank two lines?",
+          "a": "2yy"
+        },
+        {
+          "id": "2.4-q6",
+          "q": "Does moving the cursor count as a change for .?",
+          "a": "No, motions aren't repeated by .; only changes are."
+        }
+      ]
+    },
+    {
+      "id": "2.5",
+      "title": "Week 2 review",
+      "concepts": [
+        {
+          "keys": "d c y",
+          "desc": "operators (verbs)"
+        },
+        {
+          "keys": "w e b $ 0 G }",
+          "desc": "motions (nouns)"
+        },
+        {
+          "keys": "dd cc yy D C Y",
+          "desc": "line shortcuts"
+        },
+        {
+          "keys": "p P xp ddp",
+          "desc": "putting and swapping"
+        },
+        {
+          "keys": ". and counts",
+          "desc": "repetition"
+        }
+      ],
+      "tip": "Before typing, ask: which operator, which motion, and can I dot it?",
+      "quiz": [
+        {
+          "id": "2.5-q1",
+          "q": "Change the whole line?",
+          "a": "cc (or S)"
+        },
+        {
+          "id": "2.5-q2",
+          "q": "Delete to the end of the line?",
+          "a": "D"
+        },
+        {
+          "id": "2.5-q3",
+          "q": "Move the current line up one?",
+          "a": "ddkP (delete it, move up, put above)"
+        },
+        {
+          "id": "2.5-q4",
+          "q": "Delete 2 lines, then repeat it 3 times?",
+          "a": "2dd then 3. (each . deletes 2 more lines)"
+        },
+        {
+          "id": "2.5-q5",
+          "q": "Change the next two words?",
+          "a": "c2w"
+        },
+        {
+          "id": "2.5-q6",
+          "q": "Yank to the end of the file?",
+          "a": "yG"
+        }
+      ]
+    }
+  ]
+}

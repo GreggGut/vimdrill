@@ -1,0 +1,9 @@
+set number
+set relativenumber
+set scrolloff=8
+set tabstop=4
+set ignorecase
+set smartcase
+set undofile
+nnoremap Y y$
+nnoremap n nzz

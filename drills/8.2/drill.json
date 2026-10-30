@@ -1,0 +1,8 @@
+{
+  "id": "8.2",
+  "instructions": "Clean up the log with :g and :v:\n1. Delete all blank lines: :g/^$/d\n2. Keep only INFO and ERROR lines: :v/INFO\\|ERROR/d\n3. Move every ERROR line to the end: :g/ERROR/m$\n4. Append \" !\" to every ERROR line: :g/ERROR/norm A !",
+  "solution": ":g/^$/d<CR>:v/INFO\\|ERROR/d<CR>:g/ERROR/m$<CR>:g/ERROR/norm A !<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

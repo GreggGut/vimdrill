@@ -1,0 +1,3 @@
+fetch("https://api.new.com/v2/items", { method: "POST" })
+const label = `Count: ${count}`;
+assert(value === expected)

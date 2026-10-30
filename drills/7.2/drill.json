@@ -1,0 +1,8 @@
+{
+  "id": "7.2",
+  "instructions": "Mark only the ERROR lines: put \"* \" in front and \" [ticket]\" at the end.\nRecord a macro that STARTS by searching (/ERROR) so it finds its own target, then run it 4 more times.",
+  "solution": "qa/ERROR<CR>I* <Esc>A [ticket]<Esc>q4@a",
+  "open": [
+    "main.txt"
+  ]
+}

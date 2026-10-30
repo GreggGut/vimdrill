@@ -1,0 +1,8 @@
+{
+  "id": "4.5",
+  "instructions": "Review: make the left side match the right.\n- localhost -> example.com everywhere.\n- Jump with / to: true (-> false), admin (-> app), the password line (delete), level (debug -> info).",
+  "solution": ":%s/localhost/example.com/<CR>/true<CR>cwfalse<Esc>/admin<CR>cwapp<Esc>/password<CR>dd/level<CR>$ciwinfo<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

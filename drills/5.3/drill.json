@@ -1,0 +1,8 @@
+{
+  "id": "5.3",
+  "instructions": "Select, then operate:\n1. Lowercase DEBUG (select it, u).\n2. Uppercase api_base_url and max_retries (select each, U).\n3. Join the three short sentence lines into one (V, select, J).\n4. Lowercase WARNING.",
+  "solution": "f\"lveuj0wveUj0wveUj0VjjJj0veu",
+  "open": [
+    "main.txt"
+  ]
+}

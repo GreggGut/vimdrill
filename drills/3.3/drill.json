@@ -1,0 +1,8 @@
+{
+  "id": "3.3",
+  "instructions": "Word and quote text objects (the cursor doesn't need to be inside the quotes for i\" and i'):\n1. Change the name inside the quotes to Ada Lovelace (ci\").\n2. Empty the single-quoted string (di').\n3. Change the command to make clean.\n4. Delete the duplicated \"the\" (daw).\n5. Replace config.paths.output_dir with build (ciW).",
+  "solution": "ci\"Ada Lovelace<Esc>j0di'j0ci\"make clean<Esc>j0wdawj$ciWbuild<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

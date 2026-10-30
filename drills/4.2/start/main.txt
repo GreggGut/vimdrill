@@ -1,0 +1,11 @@
+def process(data):
+    tmp = load(data)
+    tmp = clean(tmp)
+    tmp = enrich(tmp)
+    return tmp
+
+# --- scratch, delete from here ---
+print(process([1, 2]))
+print("testing")
+# --- to here ---
+done = True

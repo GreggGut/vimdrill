@@ -1,0 +1,5 @@
+2026-10-01 09:00 INFO  service started
+2026-10-01 09:01 INFO  GET /users 200
+2026-10-01 09:03 INFO  GET /health 200
+2026-10-01 09:01 ERROR db timeout !
+2026-10-01 09:03 ERROR disk full !

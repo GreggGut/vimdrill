@@ -1,0 +1,109 @@
+{
+  "week": 8,
+  "title": "Ex power",
+  "goal": "Edit many lines at once from the command line: ranges, :g, :normal, :sort, :t/:m, shell filters and number increments.",
+  "lessons": [
+    {
+      "id": "8.1",
+      "title": "Ranges, :t and :m",
+      "concepts": [
+        {"keys": ":N,Md / :N,Ms/a/b/", "desc": "run an Ex command on lines N to M."},
+        {"keys": ". / $ / %", "desc": "current line / last line / the whole file (same as 1,$)."},
+        {"keys": ".,+3  $-2,$", "desc": "offsets: from here to 3 lines down; the last three lines."},
+        {"keys": "/pat1/,/pat2/", "desc": "from the next line matching pat1 to the next line matching pat2 (both searched from the cursor)."},
+        {"keys": "'a,'b  '<,'>", "desc": "between marks a and b; the last visual selection (typing : in visual mode inserts it)."},
+        {"keys": ":t / :m", "desc": ":5t. copies line 5 below the cursor; :m0 moves the current line to the top; :3m1 puts line 3 after line 1."}
+      ],
+      "tip": "With line numbers on, :12,18d is often faster than moving there and counting. :t. (duplicate the line) beats yyp when you're not on that line.",
+      "quiz": [
+        {"id": "8.1-q1", "q": "Delete lines 10 through 20.", "a": ":10,20d"},
+        {"id": "8.1-q2", "q": "What range means 'from the current line to the end of the file'?", "a": ".,$"},
+        {"id": "8.1-q3", "q": "Copy line 7 to just below the cursor.", "a": ":7t."},
+        {"id": "8.1-q4", "q": "Move the current line to the top of the file.", "a": ":m0"},
+        {"id": "8.1-q5", "q": "What does `:/start/,/end/d` do?", "a": "Deletes from the next line matching 'start' through the next line matching 'end'."},
+        {"id": "8.1-q6", "q": "You select lines in visual mode and press `:`. What appears, and what does it mean?", "a": ":'<,'> - a range covering the selected lines."}
+      ]
+    },
+    {
+      "id": "8.2",
+      "title": ":g and :v",
+      "concepts": [
+        {"keys": ":g/pat/cmd", "desc": "run an Ex command on every line matching pat."},
+        {"keys": ":v/pat/cmd (:g!)", "desc": "run it on every line NOT matching pat."},
+        {"keys": ":g/^$/d", "desc": "delete all blank lines."},
+        {"keys": ":g/TODO/m$", "desc": "move matching lines to the end, keeping their order."},
+        {"keys": ":g/pat/norm A;", "desc": "run normal-mode keys on each matching line."},
+        {"keys": ":g/pat/s//new/", "desc": "an empty pattern in :s reuses pat."}
+      ],
+      "tip": ":v/keep/d is the fastest 'grep in place': it keeps only the lines you care about. u undoes the whole :g in one go.",
+      "quiz": [
+        {"id": "8.2-q1", "q": "Delete every line containing DEBUG.", "a": ":g/DEBUG/d"},
+        {"id": "8.2-q2", "q": "Delete every line that does NOT contain 'error'.", "a": ":v/error/d (or :g!/error/d)"},
+        {"id": "8.2-q3", "q": "Delete all empty lines.", "a": ":g/^$/d"},
+        {"id": "8.2-q4", "q": "What does `:g/^import/m0` do to the order of the import lines?", "a": "Moves them to the top in reverse order (each one goes to line 0 in turn)."},
+        {"id": "8.2-q5", "q": "Add a semicolon to the end of every line containing 'let'.", "a": ":g/let/norm A;"},
+        {"id": "8.2-q6", "q": "How many undo steps does one :g command take?", "a": "One - a single u undoes it all."}
+      ]
+    },
+    {
+      "id": "8.3",
+      "title": ":normal and :sort",
+      "concepts": [
+        {"keys": ":{range}norm {keys}", "desc": "run normal-mode keys on each line of the range, starting at column 0."},
+        {"keys": ":%norm A;", "desc": "append ; to every line."},
+        {"keys": ":'<,'>norm .", "desc": "repeat the last change on each selected line."},
+        {"keys": ":sort / :sort!", "desc": "sort lines / in reverse."},
+        {"keys": ":sort u / :sort n / :sort i", "desc": "drop duplicates / sort by the first number / ignore case."},
+        {"keys": ":sort /pat/", "desc": "sort by what comes after the match (e.g. :sort /,/ sorts by the second CSV field)."}
+      ],
+      "tip": "Without a range, :sort sorts the whole file. Select a block with vip first and :sort only touches that block.",
+      "quiz": [
+        {"id": "8.3-q1", "q": "Comment out lines 5-9 with `// ` using :normal.", "a": ":5,9norm I// "},
+        {"id": "8.3-q2", "q": "Sort the selected lines and drop duplicates.", "a": ":'<,'>sort u"},
+        {"id": "8.3-q3", "q": "Why does `:sort` put '100' before '9', and how do you fix it?", "a": "It sorts as text; :sort n sorts numerically."},
+        {"id": "8.3-q4", "q": "Sort the whole file in reverse order.", "a": ":sort!"},
+        {"id": "8.3-q5", "q": "What does `:%norm .` do?", "a": "Repeats the last change on every line of the file."},
+        {"id": "8.3-q6", "q": "Where does :normal start on each line?", "a": "At the start of the line (column 0), in normal mode."}
+      ]
+    },
+    {
+      "id": "8.4",
+      "title": "Shell filters and Ctrl-a",
+      "concepts": [
+        {"keys": ":{range}!cmd", "desc": "send the lines through a shell command and replace them with its output (:%!sort, :1,5!uniq)."},
+        {"keys": "!{motion}cmd", "desc": "the same from normal mode: !ip opens :.,.+N! for the paragraph, then type the command."},
+        {"keys": ":r !cmd / :r file", "desc": "insert a command's output / a file's contents below the cursor."},
+        {"keys": "Ctrl-a / Ctrl-x", "desc": "add / subtract 1 from the number at or after the cursor. Takes a count: 5 Ctrl-a."},
+        {"keys": "g Ctrl-a (visual)", "desc": "on a selection, make a sequence: the first line +1, the second +2, and so on."}
+      ],
+      "tip": "Any Unix tool becomes a vim command: :%!sort -u, :'<,'>!column -t, :.!date. Ctrl-a searches forward for the number, so you rarely need to move onto it.",
+      "quiz": [
+        {"id": "8.4-q1", "q": "Sort the whole file with the shell's sort.", "a": ":%!sort"},
+        {"id": "8.4-q2", "q": "Insert the output of `ls` below the cursor.", "a": ":r !ls"},
+        {"id": "8.4-q3", "q": "Add 10 to the number under or after the cursor.", "a": "10 Ctrl-a"},
+        {"id": "8.4-q4", "q": "Five lines say `item 0`. Turn them into item 1 to item 5.", "a": "Select them with V, then g Ctrl-a."},
+        {"id": "8.4-q5", "q": "What does `!ip` start?", "a": "A filter over the inner paragraph: :.,.+N! is typed for you and you add the command."},
+        {"id": "8.4-q6", "q": "Decrease a number by 1.", "a": "Ctrl-x"}
+      ]
+    },
+    {
+      "id": "8.5",
+      "title": "Week 8 review",
+      "concepts": [
+        {"keys": ":N,M  .,$  %  /a/,/b/", "desc": "ranges"},
+        {"keys": ":g/pat/cmd  :v/pat/cmd", "desc": "act on matching / non-matching lines"},
+        {"keys": ":norm  :sort  :t  :m", "desc": "bulk line editing"},
+        {"keys": ":!cmd  Ctrl-a  Ctrl-x", "desc": "shell filters and numbers"}
+      ],
+      "tip": "Before writing a macro, ask whether a :g or :norm over a range does the job in one line.",
+      "quiz": [
+        {"id": "8.5-q1", "q": "Duplicate the current line without yanking it.", "a": ":t."},
+        {"id": "8.5-q2", "q": "Move every line containing 'done' to the end of the file.", "a": ":g/done/m$"},
+        {"id": "8.5-q3", "q": "Append ',' to lines 3-8.", "a": ":3,8norm A,"},
+        {"id": "8.5-q4", "q": "Sort lines 2-10 numerically.", "a": ":2,10sort n"},
+        {"id": "8.5-q5", "q": "Uppercase the whole file with a shell filter.", "a": ":%!tr a-z A-Z"},
+        {"id": "8.5-q6", "q": "Comment out the last two lines with `# `.", "a": ":$-1,$s/^/# / (or :$-1,$norm I# )"}
+      ]
+    }
+  ]
+}

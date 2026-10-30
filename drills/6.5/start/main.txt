@@ -1,0 +1,7 @@
+# Reading list
+
+See https://neovim.io for the editor.
+Docs live at https://vimhelp.org today.
+The plugin manager is at https://github.com/folke/lazy.nvim now.
+
+## Links

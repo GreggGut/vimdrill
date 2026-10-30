@@ -1,0 +1,9 @@
+{
+  "id": "9.4",
+  "instructions": "1. Find every console.log in the project:\n   :vimgrep /console\\.log/ **/*.js   (:copen shows the list)\n2. Replace them all through the quickfix list:\n   :cdo s/console\\.log/logger.debug/ | update\n3. :vimgrep /FIXME/ **/*.js, then :cn to the second match (in db.js) and delete that line with dd.\n4. :wa",
+  "solution": ":vimgrep /console\\.log/ **/*.js<CR>:cdo s/console\\.log/logger.debug/ | update<CR>:vimgrep /FIXME/ **/*.js<CR>:cn<CR>dd:wa<CR>",
+  "open": [
+    "src/app.js"
+  ],
+  "diff": false
+}

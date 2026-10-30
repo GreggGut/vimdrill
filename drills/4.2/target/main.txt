@@ -1,0 +1,7 @@
+def process(data):
+    record = load(data)
+    record = clean(record)
+    record = enrich(record)
+    return record
+
+done = True

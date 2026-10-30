@@ -1,0 +1,11 @@
+# server.conf
+port=8080
+host=localhost
+[database]
+user=root
+pass=root
+name=app
+[cache]
+# ttl=60
+# size=100
+# name=app

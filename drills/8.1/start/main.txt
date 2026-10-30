@@ -1,0 +1,13 @@
+# server.conf
+host = localhost
+port = 8080
+debug = true
+verbose = true
+trace = true
+[database]
+user = admin
+pass = admin
+name = app
+[cache]
+ttl = 60
+size = 100

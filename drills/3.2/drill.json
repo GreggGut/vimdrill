@@ -1,0 +1,8 @@
+{
+  "id": "3.2",
+  "instructions": "Repeat with ; and , and combine with operators:\n1. Line 1: f= then ; to reach action=, then delete \" status=ok\" (f<Space> dt\") and \", extra\" (f, dt)).\n2. Remove \"banana, \" (fb df<Space>).\n3. Remove \"y > 0 && \" (fy dtz).\n4. From the end, F, then ; to reach the first comma, and delete the rest of the arguments (dt)).",
+  "solution": "f=;f<Space>dt\"f,dt)j0fbdf<Space>j0fydtzj$F,;dt)",
+  "open": [
+    "main.txt"
+  ]
+}

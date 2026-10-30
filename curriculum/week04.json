@@ -1,0 +1,310 @@
+{
+  "week": 4,
+  "title": "Search",
+  "goal": "Move anywhere with search, use search as a motion, and change text across the file with :s.",
+  "lessons": [
+    {
+      "id": "4.1",
+      "title": "Search: / ? n N",
+      "concepts": [
+        {
+          "keys": "/pattern<CR>",
+          "desc": "search forward."
+        },
+        {
+          "keys": "?pattern<CR>",
+          "desc": "search backward."
+        },
+        {
+          "keys": "n / N",
+          "desc": "next / previous match in the search direction."
+        },
+        {
+          "keys": "/<CR>",
+          "desc": "repeat the last search forward."
+        },
+        {
+          "keys": "Ctrl-o",
+          "desc": "jump back to where you were before the search."
+        },
+        {
+          "keys": ":noh",
+          "desc": "clear the search highlight."
+        }
+      ],
+      "tip": "Search is the fastest long-distance motion. If you can see a unique word, /word<CR> gets you there.",
+      "quiz": [
+        {
+          "id": "4.1-q1",
+          "q": "Search forward for timeout?",
+          "a": "/timeout<CR>"
+        },
+        {
+          "id": "4.1-q2",
+          "q": "Go to the next match?",
+          "a": "n"
+        },
+        {
+          "id": "4.1-q3",
+          "q": "After a ? search, which way does n go?",
+          "a": "Backward (n follows the search direction; N goes the other way)."
+        },
+        {
+          "id": "4.1-q4",
+          "q": "Clear the search highlighting?",
+          "a": ":noh (:nohlsearch)"
+        },
+        {
+          "id": "4.1-q5",
+          "q": "Jump back to where you were before searching?",
+          "a": "Ctrl-o"
+        },
+        {
+          "id": "4.1-q6",
+          "q": "Search backward for ERROR?",
+          "a": "?ERROR<CR>"
+        }
+      ]
+    },
+    {
+      "id": "4.2",
+      "title": "* # cgn and search as a motion",
+      "concepts": [
+        {
+          "keys": "* / #",
+          "desc": "search forward / backward for the whole word under the cursor."
+        },
+        {
+          "keys": "g* / g#",
+          "desc": "the same without word boundaries."
+        },
+        {
+          "keys": "d/pat<CR>",
+          "desc": "delete from the cursor up to the match (any operator works: c/, y/)."
+        },
+        {
+          "keys": "gn",
+          "desc": "select the next match; cgn changes it."
+        },
+        {
+          "keys": "cgn then .",
+          "desc": "change one match, then . changes the next one: a precise search-and-replace."
+        }
+      ],
+      "tip": "*  +  cgn  +  . . . is a selective rename: press n to skip a match you want to keep.",
+      "quiz": [
+        {
+          "id": "4.2-q1",
+          "q": "Find the next occurrence of the word under the cursor?",
+          "a": "*"
+        },
+        {
+          "id": "4.2-q2",
+          "q": "Delete from the cursor up to the next occurrence of 'end'?",
+          "a": "d/end<CR>"
+        },
+        {
+          "id": "4.2-q3",
+          "q": "What does cgn do?",
+          "a": "Changes the next search match (and is repeatable with .)."
+        },
+        {
+          "id": "4.2-q4",
+          "q": "Find the previous occurrence of the word under the cursor?",
+          "a": "#"
+        },
+        {
+          "id": "4.2-q5",
+          "q": "After cgn, how do you skip one match and change the following one?",
+          "a": "n then ."
+        },
+        {
+          "id": "4.2-q6",
+          "q": "Difference between * and g*?",
+          "a": "* matches the whole word only (\\<word\\>); g* also matches it inside longer words."
+        }
+      ]
+    },
+    {
+      "id": "4.3",
+      "title": "Substitute: :s and :%s",
+      "concepts": [
+        {
+          "keys": ":s/old/new/",
+          "desc": "replace the first match on the current line."
+        },
+        {
+          "keys": ":s/old/new/g",
+          "desc": "replace all matches on the line."
+        },
+        {
+          "keys": ":%s/old/new/g",
+          "desc": "replace in the whole file."
+        },
+        {
+          "keys": "flags",
+          "desc": "g = all per line, c = confirm each, i / I = ignore / match case."
+        },
+        {
+          "keys": ":Ns/.../.../",
+          "desc": "on line N only, e.g. :2s/a/b/."
+        }
+      ],
+      "tip": "Add c (:%s/a/b/gc) when you're not sure: y/n per match, a for all, q to quit.",
+      "quiz": [
+        {
+          "id": "4.3-q1",
+          "q": "Replace foo with bar everywhere in the file?",
+          "a": ":%s/foo/bar/g"
+        },
+        {
+          "id": "4.3-q2",
+          "q": "What does the c flag do?",
+          "a": "Asks for confirmation at each match."
+        },
+        {
+          "id": "4.3-q3",
+          "q": "Replace only the first match on the current line?",
+          "a": ":s/foo/bar/"
+        },
+        {
+          "id": "4.3-q4",
+          "q": "Replace case-insensitively?",
+          "a": "add the i flag: :%s/foo/bar/gi (or \\c in the pattern)"
+        },
+        {
+          "id": "4.3-q5",
+          "q": "What does the g flag mean?",
+          "a": "Replace all matches on each line, not just the first."
+        },
+        {
+          "id": "4.3-q6",
+          "q": "Replace on line 10 only?",
+          "a": ":10s/foo/bar/"
+        }
+      ]
+    },
+    {
+      "id": "4.4",
+      "title": "Ranges and patterns in :s",
+      "concepts": [
+        {
+          "keys": ":a,bs/...",
+          "desc": "line range: :4,9s, :.,$s (here to end), :.,+3s."
+        },
+        {
+          "keys": "\\<word\\>",
+          "desc": "word boundaries: \\<cat\\> doesn't match category."
+        },
+        {
+          "keys": "&",
+          "desc": "in the replacement: the whole match (:s/\\d\\+/[&]/)."
+        },
+        {
+          "keys": "\\( \\) and \\1 \\2",
+          "desc": "capture groups and back-references."
+        },
+        {
+          "keys": "\\w \\d \\+ .*",
+          "desc": "word char, digit, one or more, anything."
+        },
+        {
+          "keys": ":%s//new/g",
+          "desc": "an empty pattern reuses the last search (search with * first)."
+        }
+      ],
+      "tip": "Build the pattern with / first and watch the highlights, then run :%s//replacement/g.",
+      "quiz": [
+        {
+          "id": "4.4-q1",
+          "q": "Replace on lines 5 to 10 only?",
+          "a": ":5,10s/old/new/g"
+        },
+        {
+          "id": "4.4-q2",
+          "q": "Match 'cat' but not 'category'?",
+          "a": "\\<cat\\>"
+        },
+        {
+          "id": "4.4-q3",
+          "q": "What does & mean in the replacement?",
+          "a": "The whole matched text."
+        },
+        {
+          "id": "4.4-q4",
+          "q": "Swap 'John Smith' to 'Smith, John'?",
+          "a": ":s/\\(\\w\\+\\) \\(\\w\\+\\)/\\2, \\1/"
+        },
+        {
+          "id": "4.4-q5",
+          "q": "Replace from the current line to the end of the file?",
+          "a": ":.,$s/old/new/g"
+        },
+        {
+          "id": "4.4-q6",
+          "q": "What does :%s//X/g do?",
+          "a": "Replaces matches of the last search pattern with X."
+        }
+      ]
+    },
+    {
+      "id": "4.5",
+      "title": "Week 4 review",
+      "concepts": [
+        {
+          "keys": "/ ? n N",
+          "desc": "search"
+        },
+        {
+          "keys": "* # gn",
+          "desc": "word search and change-next-match"
+        },
+        {
+          "keys": "d/ c/",
+          "desc": "search as a motion"
+        },
+        {
+          "keys": ":%s/a/b/gc",
+          "desc": "substitute with flags"
+        },
+        {
+          "keys": "ranges \\< \\> & \\1",
+          "desc": "precise substitutes"
+        }
+      ],
+      "tip": "Pick the tool: one-off far away? /. Same word many times? * + cgn. Every match in a range? :s.",
+      "quiz": [
+        {
+          "id": "4.5-q1",
+          "q": "Rename a variable everywhere, whole words only?",
+          "a": ":%s/\\<old\\>/new/g"
+        },
+        {
+          "id": "4.5-q2",
+          "q": "Jump to the next occurrence of the word under the cursor?",
+          "a": "*"
+        },
+        {
+          "id": "4.5-q3",
+          "q": "Change from the cursor to the word 'end'?",
+          "a": "c/end<CR>"
+        },
+        {
+          "id": "4.5-q4",
+          "q": "Replace with confirmation in the whole file?",
+          "a": ":%s/a/b/gc"
+        },
+        {
+          "id": "4.5-q5",
+          "q": "Wrap every number on lines 1-5 in brackets?",
+          "a": ":1,5s/\\d\\+/[&]/g"
+        },
+        {
+          "id": "4.5-q6",
+          "q": "Go to the previous search match?",
+          "a": "N"
+        }
+      ]
+    }
+  ]
+}

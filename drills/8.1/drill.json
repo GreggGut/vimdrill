@@ -1,0 +1,8 @@
+{
+  "id": "8.1",
+  "instructions": "1. Delete the debug/verbose/trace lines with one range: :4,6d\n2. Move the port line above host: :3m1\n3. Between [database] and [cache], change admin to root:\n   gg then :/database/,/cache/s/admin/root/g\n4. Copy the name line to the end of the file (:t$).\n5. Comment out the last three lines: :$-2,$s/^/# /\n6. Remove the spaces around = in the whole file (%).",
+  "solution": ":4,6d<CR>:3m1<CR>gg:/database/,/cache/s/admin/root/g<CR>:/name/t$<CR>:$-2,$s/^/# /<CR>:%s/ = /=/g<CR>",
+  "open": [
+    "main.txt"
+  ]
+}

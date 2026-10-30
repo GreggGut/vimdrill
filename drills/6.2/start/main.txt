@@ -1,0 +1,6 @@
+SERVICE_NAME=billing-api
+PORT=9090
+JUNK LINE - delete me with the black hole register
+url = http://localhost:/health
+name = 
+timeout_seconds = 

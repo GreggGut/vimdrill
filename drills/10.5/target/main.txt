@@ -1,0 +1,9 @@
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.scrolloff = 8
+vim.opt.tabstop = 4
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.undofile = true
+vim.keymap.set('n', 'Y', 'y$')
+vim.keymap.set('n', 'n', 'nzz')

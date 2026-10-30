@@ -1,0 +1,8 @@
+{
+  "id": "12.1",
+  "open": [
+    "main.js"
+  ],
+  "instructions": "Refactor this function (vimgolf: find the shortest route):\n1. Rename total -> orderTotal.\n2. var sum -> let sum.\n3. Replace the index loop header with: for (const item of items)\n4. Use += and item instead of items[i] in the loop body.\nIdeas: cw, ci(, :s with a pattern, & to repeat a substitution.",
+  "solution": "wcworderTotal<Esc>j^cwlet<Esc>jf(ci(const item of items<Esc>j:s/= sum +/+=/<CR>:s/items\\[i\\]/item/g<CR>"
+}

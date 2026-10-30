@@ -1,0 +1,8 @@
+INSERT INTO users VALUES (1,'Alice','admin');
+INSERT INTO users VALUES (2,'Bob','dev');
+INSERT INTO users VALUES (3,'Carol','dev');
+INSERT INTO users VALUES (4,'Dave','ops');
+INSERT INTO users VALUES (5,'Mary Ann','support');
+INSERT INTO users VALUES (6,'Eve','security');
+INSERT INTO users VALUES (7,'Frank','dev');
+INSERT INTO users VALUES (8,'Grace','admin');

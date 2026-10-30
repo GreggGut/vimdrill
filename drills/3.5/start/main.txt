@@ -1,0 +1,3 @@
+fetch("https://api.old.com/v1/items", { method: "GET", cache: "no-store" })
+const label = `Total: ${count} items`;
+assert(value == expected, "values differ")

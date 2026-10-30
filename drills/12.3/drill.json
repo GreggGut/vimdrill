@@ -1,0 +1,8 @@
+{
+  "id": "12.3",
+  "instructions": "Rewrite this key = value config as JSON:\n- Every line becomes   \"key\": \"value\",   indented by 2 spaces.\n- Numbers and true/false lose their quotes.\n- No comma after the last entry. Wrap everything in { }.\nTwo substitutions, then a couple of small edits.\nautoindent will indent the new { } lines: type 0 then Ctrl-d to drop the indent.",
+  "solution": ":%s/\\(\\w\\+\\) = \\(.*\\)/  \"\\1\": \"\\2\",/<CR>:%s/\"\\(\\d\\+\\|true\\|false\\)\"/\\1/<CR>G$xggO0<C-d>{<Esc>Go0<C-d>}<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

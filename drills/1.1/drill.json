@@ -1,0 +1,8 @@
+{
+  "id": "1.1",
+  "instructions": "Remove the doubled letters: brownn, dogg, bazz, easyy, WWORD and iindented.\nUse w/b/e/W/B/E and 0/^/$ to get there, then x. Avoid holding \u2190 / \u2192.",
+  "solution": "wwex$bexj0WWWWwwwwexj$bexj$Bxj^x",
+  "open": [
+    "main.txt"
+  ]
+}

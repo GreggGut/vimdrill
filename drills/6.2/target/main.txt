@@ -1,0 +1,5 @@
+SERVICE_NAME=billing-api
+PORT=9090
+url = http://localhost:9090/health
+name = billing-api
+timeout_seconds = 300

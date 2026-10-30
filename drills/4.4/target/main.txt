@@ -1,0 +1,8 @@
+let dog = 1;
+let category = 2;
+let concat = dog + 3;
+// TODO(ada): fix this
+// TODO(ada): and this
+// TODO: keep this one as is
+Smith, John
+Lovelace, Ada

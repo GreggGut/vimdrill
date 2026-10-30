@@ -1,0 +1,6 @@
+function greet(name, greeting, unused) {
+  var message = greeting + ", " + name;
+  console.log("debug 1");
+  console.log("debug 2");
+  return mesage;
+}

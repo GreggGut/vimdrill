@@ -1,0 +1,5 @@
+log.info("user=alice action=login")
+items = [apple, cherry, date]
+if (x > 0 && z > 0) {
+    send(message)
+}

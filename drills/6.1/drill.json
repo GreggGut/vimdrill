@@ -1,0 +1,8 @@
+{
+  "id": "6.1",
+  "instructions": "1. Yank the version 2.4.1 (yE), then replace PLACEHOLDER with it: diw, then \"0P (the yank register survives the delete).\n2. Move the three TODO lines under \"## Collected TODOs\": delete the first with \"add, the others with \"Add (capital = append), then paste with \"ap.",
+  "solution": "WyEj0wdiw\"0Pj\"addj\"Addj\"AddG\"ap",
+  "open": [
+    "main.txt"
+  ]
+}

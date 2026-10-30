@@ -1,0 +1,8 @@
+{
+  "id": "12.4",
+  "instructions": "Turn each row into an SQL INSERT. Record a macro on the first line, then replay it:\n  alice 34 admin  ->  INSERT INTO users VALUES ('alice', 34, 'admin');\nMake the macro end on the next line (j) so 3@a or 100@a finishes the job.\n(A :%s solution is fine too, but the point of this one is the macro.)",
+  "solution": "qaIINSERT INTO users VALUES ('<Esc>ea',<Esc>wea,<Esc>wi'<Esc>A');<Esc>jq3@a",
+  "open": [
+    "main.txt"
+  ]
+}

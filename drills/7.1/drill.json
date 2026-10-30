@@ -1,0 +1,8 @@
+{
+  "id": "7.1",
+  "instructions": "Turn every line into a JSON entry:  \"host\": \"localhost\",\n1. First add the { and } lines (before indenting anything, or o/O will copy the indent).\n2. Record the edit for the host line into register a (qa ... j q).\n3. Replay it on the other 9 lines (9@a, or @a then @@).",
+  "solution": "O{<Esc>Go}<Esc>ggjqa0i  \"<Esc>ea\":<Esc>wi\"<Esc>A\",<Esc>jq9@a",
+  "open": [
+    "main.txt"
+  ]
+}

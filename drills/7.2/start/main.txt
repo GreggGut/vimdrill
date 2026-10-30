@@ -1,0 +1,10 @@
+12:00:01 INFO  user login ok
+12:00:02 ERROR db timeout
+12:00:05 INFO  cache warm
+12:00:09 ERROR payment declined by bank
+12:00:10 INFO  user logout
+12:00:12 ERROR db timeout
+12:00:15 INFO  job started
+12:00:17 ERROR disk almost full
+12:00:20 INFO  job done
+12:00:21 ERROR mail bounce

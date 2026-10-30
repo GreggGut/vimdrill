@@ -1,0 +1,5 @@
+const LOG_LEVEL = "debug";
+const API_BASE_URL = "https://example.com";
+const MAX_RETRIES = 3;
+This sentence was wrapped way too early.
+warning: do not edit

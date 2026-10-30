@@ -1,0 +1,8 @@
+{
+  "id": "5.4",
+  "instructions": "Select with text objects:\n1. Delete the whole unused() function and the blank line after it (vap, d).\n2. Change the arguments of the greet(...) call to \"Vim\", \"Hi\" (vi(, c).\n3. Change the \", \" string on line 2 to \" - \" (f\" onto the quote, then vi\", c).",
+  "solution": ":5<CR>vapdf(vi(c\"Vim\", \"Hi\"<Esc>:2<CR>0f\"vi\"c - <Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

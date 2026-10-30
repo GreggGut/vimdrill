@@ -1,0 +1,9 @@
+# shopping list
+milk
+eggs
+bread
+
+# todo
+call mom
+fix the bikee
+pay rent

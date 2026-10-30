@@ -1,0 +1,306 @@
+{
+  "week": 5,
+  "title": "Visual mode",
+  "goal": "Select exactly the text you mean - by character, line or column - and apply any operator to it.",
+  "lessons": [
+    {
+      "id": "5.1",
+      "title": "Charwise and linewise selections",
+      "concepts": [
+        {
+          "keys": "v / V",
+          "desc": "start a charwise / linewise selection. Any motion extends it."
+        },
+        {
+          "keys": "d / c / y (in visual)",
+          "desc": "delete / change / yank the selection."
+        },
+        {
+          "keys": "o",
+          "desc": "jump to the other end of the selection, to extend it the other way."
+        },
+        {
+          "keys": "gv",
+          "desc": "reselect the last visual selection."
+        },
+        {
+          "keys": "p (in visual)",
+          "desc": "replace the selection with the register contents."
+        },
+        {
+          "keys": "Esc",
+          "desc": "leave visual mode without doing anything."
+        }
+      ],
+      "tip": "Visual mode is great when you need to see what you're about to change. But if a plain operator + motion works (d3j, cE), it's shorter and . can repeat it.",
+      "quiz": [
+        {
+          "id": "5.1-q1",
+          "q": "Which key selects whole lines?",
+          "a": "V"
+        },
+        {
+          "id": "5.1-q2",
+          "q": "You selected too little at the top of a selection. How do you move the start of the selection instead of the end?",
+          "a": "o (switches to the other end)."
+        },
+        {
+          "id": "5.1-q3",
+          "q": "How do you reselect what you last had selected?",
+          "a": "gv"
+        },
+        {
+          "id": "5.1-q4",
+          "q": "What does `p` do while text is selected?",
+          "a": "Replaces the selection with the register contents (the replaced text goes into the unnamed register)."
+        },
+        {
+          "id": "5.1-q5",
+          "q": "Select the current line plus the two below and delete them, using visual mode.",
+          "a": "Vjjd (or V2jd)"
+        },
+        {
+          "id": "5.1-q6",
+          "q": "Why is `d2j` often better than `Vjjd`?",
+          "a": "Fewer keys, and . can repeat it exactly."
+        }
+      ]
+    },
+    {
+      "id": "5.2",
+      "title": "Visual block: editing columns",
+      "concepts": [
+        {
+          "keys": "Ctrl-v",
+          "desc": "start a rectangular (block) selection."
+        },
+        {
+          "keys": "I{text}<Esc>",
+          "desc": "in block mode: insert text before the block on every line."
+        },
+        {
+          "keys": "$A{text}<Esc>",
+          "desc": "in block mode: append text at the end of every line, even when the lines have different lengths."
+        },
+        {
+          "keys": "c / r{c} / d",
+          "desc": "change / replace every char / delete the whole column."
+        },
+        {
+          "keys": "O",
+          "desc": "in block mode: jump to the other corner on the same line."
+        }
+      ],
+      "tip": "The block edit only shows on the first line while you type; the other lines update when you press Esc. That's normal.",
+      "quiz": [
+        {
+          "id": "5.2-q1",
+          "q": "Prefix 10 lines with `// ` using visual block mode.",
+          "a": "Ctrl-v 9j I// <Esc> (9↓ works too)"
+        },
+        {
+          "id": "5.2-q2",
+          "q": "Lines have different lengths. How do you append `;` to all of them with block mode?",
+          "a": "Ctrl-v, select the lines, $A;<Esc>"
+        },
+        {
+          "id": "5.2-q3",
+          "q": "You typed in block-insert mode but only the first line changed. What do you do?",
+          "a": "Press Esc; the change is copied to the other lines then."
+        },
+        {
+          "id": "5.2-q4",
+          "q": "What does `r-` do on a block selection?",
+          "a": "Replaces every selected character with -."
+        },
+        {
+          "id": "5.2-q5",
+          "q": "Which key starts block selection?",
+          "a": "Ctrl-v"
+        },
+        {
+          "id": "5.2-q6",
+          "q": "In block mode, what's the difference between o and O?",
+          "a": "o goes to the diagonally opposite corner; O goes to the other corner on the same line."
+        }
+      ]
+    },
+    {
+      "id": "5.3",
+      "title": "Case, joining and indenting selections",
+      "concepts": [
+        {
+          "keys": "u / U / ~",
+          "desc": "in visual: lowercase / uppercase / toggle case of the selection."
+        },
+        {
+          "keys": "J / gJ",
+          "desc": "join the selected lines (gJ adds no spaces)."
+        },
+        {
+          "keys": "> / <",
+          "desc": "indent / unindent the selected lines by shiftwidth. Use a count (3>) for more levels."
+        },
+        {
+          "keys": "=",
+          "desc": "auto-indent the selection (uses the filetype's indent rules)."
+        },
+        {
+          "keys": ".",
+          "desc": "after a visual operation, . repeats it on the same amount of text from the cursor."
+        }
+      ],
+      "tip": "In visual mode u lowercases, it does NOT undo. If you mean undo, press Esc first.",
+      "quiz": [
+        {
+          "id": "5.3-q1",
+          "q": "What does `u` do in visual mode?",
+          "a": "Lowercases the selection (not undo)."
+        },
+        {
+          "id": "5.3-q2",
+          "q": "Uppercase the current word using visual mode.",
+          "a": "viwU (or veU from the word start)"
+        },
+        {
+          "id": "5.3-q3",
+          "q": "Indent the selected lines two levels at once.",
+          "a": "2>"
+        },
+        {
+          "id": "5.3-q4",
+          "q": "Join 4 selected lines without adding spaces between them.",
+          "a": "gJ"
+        },
+        {
+          "id": "5.3-q5",
+          "q": "Which key re-indents a selected block of code according to the filetype?",
+          "a": "="
+        },
+        {
+          "id": "5.3-q6",
+          "q": "You pressed > on a selection and want to do it again on the same lines.",
+          "a": "gv> (or . to repeat)"
+        }
+      ]
+    },
+    {
+      "id": "5.4",
+      "title": "Selecting with text objects",
+      "concepts": [
+        {
+          "keys": "viw / vaw",
+          "desc": "select inner word / word plus trailing space."
+        },
+        {
+          "keys": "vi( vi\" vi{",
+          "desc": "select inside brackets or quotes (va... includes the delimiters)."
+        },
+        {
+          "keys": "vip / vap",
+          "desc": "select the paragraph / paragraph plus the blank line after it."
+        },
+        {
+          "keys": "repeat the object",
+          "desc": "pressing ip, i( etc. again grows the selection to the next level."
+        },
+        {
+          "keys": "vit / vat",
+          "desc": "select inside / around an XML or HTML tag."
+        }
+      ],
+      "tip": "Use v + text object to check what an object covers before you use it with an operator: vi( shows what di( would delete.",
+      "quiz": [
+        {
+          "id": "5.4-q1",
+          "q": "Select a whole function body separated by blank lines, including the trailing blank line.",
+          "a": "vap"
+        },
+        {
+          "id": "5.4-q2",
+          "q": "Select the text inside double quotes, without the quotes.",
+          "a": "vi\""
+        },
+        {
+          "id": "5.4-q3",
+          "q": "You did vi( and want to grow the selection to the enclosing parens' contents. What do you press?",
+          "a": "i( again (or a( to include the parens)."
+        },
+        {
+          "id": "5.4-q4",
+          "q": "Difference between vi{ and va{?",
+          "a": "vi{ selects inside the braces; va{ includes the braces."
+        },
+        {
+          "id": "5.4-q5",
+          "q": "Select the content of an HTML tag.",
+          "a": "vit"
+        },
+        {
+          "id": "5.4-q6",
+          "q": "Why practice v + text object before d + text object?",
+          "a": "You see exactly what the object covers before you change anything."
+        }
+      ]
+    },
+    {
+      "id": "5.5",
+      "title": "Week 5 review",
+      "concepts": [
+        {
+          "keys": "v V Ctrl-v",
+          "desc": "the three selection modes"
+        },
+        {
+          "keys": "o gv",
+          "desc": "adjust or reselect"
+        },
+        {
+          "keys": "I $A c r d",
+          "desc": "block edits"
+        },
+        {
+          "keys": "u U ~ J > < =",
+          "desc": "selection operators"
+        },
+        {
+          "keys": "vi( vap vit",
+          "desc": "text-object selections"
+        }
+      ],
+      "tip": "Ask yourself each time: would a plain operator + motion be shorter? Use visual mode when you need to see the selection, or for columns.",
+      "quiz": [
+        {
+          "id": "5.5-q1",
+          "q": "Comment out 5 lines with `# ` using block mode.",
+          "a": "Ctrl-v 4j I# <Esc> (4↓ works too)"
+        },
+        {
+          "id": "5.5-q2",
+          "q": "Uppercase the whole current line using visual mode.",
+          "a": "VU"
+        },
+        {
+          "id": "5.5-q3",
+          "q": "Reselect the last selection and indent it.",
+          "a": "gv>"
+        },
+        {
+          "id": "5.5-q4",
+          "q": "Select the paragraph the cursor is in, without the blank line after it.",
+          "a": "vip"
+        },
+        {
+          "id": "5.5-q5",
+          "q": "Replace a selected word with the text you yanked earlier.",
+          "a": "p (in visual mode)"
+        },
+        {
+          "id": "5.5-q6",
+          "q": "Append ` \\` to the end of 6 lines of different lengths.",
+          "a": "Ctrl-v 5j $A \\<Esc> (5↓ works too)"
+        }
+      ]
+    }
+  ]
+}

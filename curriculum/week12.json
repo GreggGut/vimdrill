@@ -1,0 +1,302 @@
+{
+  "week": 12,
+  "title": "Fluency",
+  "goal": "Combine everything: pick the shortest path for real edits without thinking about the keys.",
+  "lessons": [
+    {
+      "id": "12.1",
+      "title": "Refactoring a code block",
+      "concepts": [
+        {
+          "keys": "cw / ciw / ci( / ct;",
+          "desc": "change exactly the piece you mean: a word, inside brackets, up to a character."
+        },
+        {
+          "keys": ":s/old/new/ + &",
+          "desc": "substitute on this line; & repeats the last :s on another line (g& on all lines)."
+        },
+        {
+          "keys": "\\[ \\]",
+          "desc": "in a pattern, escape [ ] to match them literally (items\\[i\\])."
+        },
+        {
+          "keys": "f( / ; / ,",
+          "desc": "land on punctuation in one jump, then repeat."
+        },
+        {
+          "keys": ". and n.",
+          "desc": "repeat the last change; with * or n, step to the next match and repeat it."
+        }
+      ],
+      "tip": "Before you start, decide on the plan: which parts are text objects (ci(), which are patterns (:s), which are one-offs (cw). The plan matters more than typing speed.",
+      "quiz": [
+        {
+          "id": "12.1-q1",
+          "q": "Replace everything inside the parentheses on this line with `x`.",
+          "a": "f( then ci(x<Esc> (ci( also works with the cursor already inside)."
+        },
+        {
+          "id": "12.1-q2",
+          "q": "Repeat the last :s on the current line.",
+          "a": "& (or :s)"
+        },
+        {
+          "id": "12.1-q3",
+          "q": "Repeat the last :s, with the same flags, on every line.",
+          "a": "g& (same as :%s//~/&)"
+        },
+        {
+          "id": "12.1-q4",
+          "q": "Pattern that matches the literal text `items[i]`.",
+          "a": "items\\[i\\]"
+        },
+        {
+          "id": "12.1-q5",
+          "q": "Change `var` to `let` in 5 places spread through a file, using * and .",
+          "a": "* on var (or /var), cw let<Esc>, then n. n. n. ..."
+        },
+        {
+          "id": "12.1-q6",
+          "q": "Change from the cursor up to (not including) the next `;`.",
+          "a": "ct;"
+        }
+      ]
+    },
+    {
+      "id": "12.2",
+      "title": "Reshaping data: logs to CSV",
+      "concepts": [
+        {
+          "keys": ":v/pat/d",
+          "desc": "delete every line that does NOT match (same as :g!/pat/d)."
+        },
+        {
+          "keys": ":%s/\\(..\\) \\(..\\)/\\2,\\1/",
+          "desc": "capture groups reorder fields in one pass."
+        },
+        {
+          "keys": "\\S\\+",
+          "desc": "one field (a run of non-space characters)."
+        },
+        {
+          "keys": ":sort / :sort n / :sort u",
+          "desc": "sort lines alphabetically / by number / and drop duplicates."
+        },
+        {
+          "keys": "\\v (very magic)",
+          "desc": "write (a|b)+ without backslashes: :%s/\\v(\\S+) (\\S+)/\\2 \\1/"
+        }
+      ],
+      "tip": "For data reshaping, think in whole-buffer commands: filter (:g/:v), transform (:s), order (:sort). Three commands, any number of lines.",
+      "quiz": [
+        {
+          "id": "12.2-q1",
+          "q": "Delete all lines that don't contain ERROR.",
+          "a": ":v/ERROR/d (or :g!/ERROR/d)"
+        },
+        {
+          "id": "12.2-q2",
+          "q": "Swap two space-separated words on every line.",
+          "a": ":%s/\\(\\S\\+\\) \\(\\S\\+\\)/\\2 \\1/ (or with \\v: :%s/\\v(\\S+) (\\S+)/\\2 \\1/)"
+        },
+        {
+          "id": "12.2-q3",
+          "q": "Sort lines numerically.",
+          "a": ":sort n"
+        },
+        {
+          "id": "12.2-q4",
+          "q": "Sort and remove duplicate lines.",
+          "a": ":sort u"
+        },
+        {
+          "id": "12.2-q5",
+          "q": "What does \\v at the start of a pattern change?",
+          "a": "Very magic: ( ) | + ? { have their special meaning without backslashes."
+        },
+        {
+          "id": "12.2-q6",
+          "q": "Copy every line containing TODO to the end of the file.",
+          "a": ":g/TODO/t$"
+        }
+      ]
+    },
+    {
+      "id": "12.3",
+      "title": "Rewriting a config format",
+      "concepts": [
+        {
+          "keys": "\\(a\\|b\\)",
+          "desc": "alternation in a group: match a or b."
+        },
+        {
+          "keys": "\\d\\+",
+          "desc": "one or more digits."
+        },
+        {
+          "keys": "G$x / ggO / Go",
+          "desc": "fix the last line, open a line above the first, open one below the last."
+        },
+        {
+          "keys": "0 Ctrl-d / Ctrl-d / Ctrl-t (insert)",
+          "desc": "remove all indent on this line / one level less / one level more, while typing."
+        },
+        {
+          "keys": ":'<,'>s",
+          "desc": "substitute only in the visual selection."
+        },
+        {
+          "keys": "gv",
+          "desc": "reselect the last visual selection, to run a second command on the same lines."
+        }
+      ],
+      "tip": "Do the bulk change first, then patch the exceptions (the last comma, the wrapping braces). Don't try to write one perfect regex.",
+      "quiz": [
+        {
+          "id": "12.3-q1",
+          "q": "Remove the quotes around values that are digits or true/false.",
+          "a": ":%s/\"\\(\\d\\+\\|true\\|false\\)\"/\\1/"
+        },
+        {
+          "id": "12.3-q2",
+          "q": "Delete the last character of the last line of the file.",
+          "a": "G$x"
+        },
+        {
+          "id": "12.3-q3",
+          "q": "Run a substitution only on the lines you just selected visually.",
+          "a": ":'<,'>s/.../.../ (press : in visual mode to get the range)"
+        },
+        {
+          "id": "12.3-q4",
+          "q": "Reselect the previous visual selection.",
+          "a": "gv"
+        },
+        {
+          "id": "12.3-q5",
+          "q": "Indent the entire file by one level.",
+          "a": ":%> (or gg>G)"
+        },
+        {
+          "id": "12.3-q6",
+          "q": "In a pattern, what does \\| do?",
+          "a": "Alternation: match the left OR the right side."
+        }
+      ]
+    },
+    {
+      "id": "12.4",
+      "title": "Macros at scale",
+      "concepts": [
+        {
+          "keys": "qa ... q / @a / @@",
+          "desc": "record into register a / replay / replay the last macro."
+        },
+        {
+          "keys": "100@a",
+          "desc": "run until it fails: the macro stops at the first motion that can't move (e.g. j on the last line)."
+        },
+        {
+          "keys": ":%norm @a / :'<,'>norm @a",
+          "desc": "run a macro on every line / each selected line."
+        },
+        {
+          "keys": "I / A / e / w in macros",
+          "desc": "use motions that work on every line regardless of length; avoid counting with l."
+        },
+        {
+          "keys": "\"ap ... \"ayy",
+          "desc": "paste a macro, edit it as text, yank it back into the register."
+        }
+      ],
+      "tip": "Start the macro by getting to a known position (I, 0, ^) and end it on the next line with j. Then it's safe to replay any number of times.",
+      "quiz": [
+        {
+          "id": "12.4-q1",
+          "q": "Replay macro a on every line of the file.",
+          "a": ":%norm @a"
+        },
+        {
+          "id": "12.4-q2",
+          "q": "Why is `100@a` safe on a 12-line file?",
+          "a": "The macro aborts as soon as a command fails (like j/↓ on the last line), so the extra runs never happen."
+        },
+        {
+          "id": "12.4-q3",
+          "q": "How do you fix a typo inside the recorded macro a?",
+          "a": "\"ap to paste it, edit the text, then 0\"ay$ (or \"add) to yank it back; :let @a='...' also works."
+        },
+        {
+          "id": "12.4-q4",
+          "q": "Replay the last macro you ran.",
+          "a": "@@"
+        },
+        {
+          "id": "12.4-q5",
+          "q": "Why prefer `e` or `f,` over `lllll` inside a macro?",
+          "a": "Lines differ in length; motions based on text structure work on every line, fixed column counts don't."
+        },
+        {
+          "id": "12.4-q6",
+          "q": "Append to an existing macro in register a.",
+          "a": "qA ... q (uppercase register appends)"
+        }
+      ]
+    },
+    {
+      "id": "12.5",
+      "title": "Graduation: your own cheat sheet",
+      "concepts": [
+        {
+          "keys": ":r !cmd",
+          "desc": "insert a shell command's output below the cursor."
+        },
+        {
+          "keys": "gq{motion} / gqip",
+          "desc": "reflow text to 'textwidth'."
+        },
+        {
+          "keys": "vimdrill --review",
+          "desc": "random replay of a past drill. Keep a weekly habit."
+        },
+        {
+          "keys": "vimgolf.com",
+          "desc": "community challenges to keep improving after the course."
+        }
+      ],
+      "tip": "Mastery is a habit, not a finish line: one vimgolf challenge or one vimdrill --review a week keeps it sharp, and :help is where you look next.",
+      "quiz": [
+        {
+          "id": "12.5-q1",
+          "q": "Insert the output of `date` below the cursor.",
+          "a": ":r !date"
+        },
+        {
+          "id": "12.5-q2",
+          "q": "Reflow the current paragraph.",
+          "a": "gqip (or gwip to keep the cursor in place)"
+        },
+        {
+          "id": "12.5-q3",
+          "q": "Lowercase a whole paragraph.",
+          "a": "guip"
+        },
+        {
+          "id": "12.5-q4",
+          "q": "Delete every blank line in the file.",
+          "a": ":g/^\\s*$/d"
+        },
+        {
+          "id": "12.5-q5",
+          "q": "Search help for anything mentioning 'textwidth'.",
+          "a": ":helpgrep textwidth (or :help 'textwidth' for the option itself)"
+        },
+        {
+          "id": "12.5-q6",
+          "q": "Swap two adjacent lines.",
+          "a": "ddp"
+        }
+      ]
+    }
+  ]
+}

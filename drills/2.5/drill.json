@@ -1,0 +1,8 @@
+{
+  "id": "2.5",
+  "instructions": "Review: make the left side match the right.\n- Remove the unused parameter (6w then de).\n- var -> const.\n- Delete both console.log lines with one command.\n- Fix mesage.\n- Add the greet call below the closing brace.",
+  "solution": "6wdej^cwconst<Esc>j2ddwcwmessage<Esc>jogreet(\"Ada\", \"Hello\");<Esc>",
+  "open": [
+    "main.txt"
+  ]
+}

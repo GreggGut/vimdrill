@@ -1,0 +1,5 @@
+{
+  "id": "10.3",
+  "type": "task",
+  "instructions": "Add the options and the autocmd most Neovim users end up with.\n\n1. In init.lua add:\n     vim.opt.relativenumber = true   -- keep number = true too: you get a hybrid\n     vim.opt.scrolloff = 8\n     vim.opt.undofile = true\n     vim.opt.smartcase = true        -- with ignorecase: case-sensitive once you type a capital\n     vim.opt.splitright = true\n     vim.opt.splitbelow = true\n2. Highlight on yank:\n     local grp = vim.api.nvim_create_augroup('my_config', { clear = true })\n     vim.api.nvim_create_autocmd('TextYankPost', {\n       group = grp,\n       callback = function() vim.hl.on_yank() end,\n     })\n3. Optional: spell checking on every file (`set spell`) is noisy in code.\n   If you want it, make it prose-only:\n     vim.api.nvim_create_autocmd('FileType', { group = grp,\n       pattern = { 'markdown', 'gitcommit', 'text' },\n       callback = function() vim.opt_local.spell = true end })\n4. Restart. Run yip and watch the flash. Try 5j using the relative numbers.\n\nRead more: :help 'scrolloff', :help 'smartcase', :help nvim_create_autocmd(), :help vim.hl.on_yank()"
+}

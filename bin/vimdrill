@@ -1,0 +1,682 @@
+#!/usr/bin/env python3
+"""vimdrill - daily vim drills, streak and lesson gate for ~/vim-mastery.
+
+  vimdrill                 run today's drill (current lesson)
+  vimdrill <id>            practice a specific unlocked drill (doesn't count)
+  vimdrill --review        practice a random completed drill (doesn't count)
+  vimdrill --mix [SEED]    4 freshly generated rounds from every unlocked lesson (doesn't count)
+  vimdrill --check         check a 'task' drill (config lessons)
+  vimdrill --show [id]     print the lesson card (concepts + tip)
+  vimdrill --status        one-line status (used by the shell nudge)
+  vimdrill --state         machine-readable summary for /vim-daily
+  vimdrill --record-quiz SCORE [--missed id,id] [--asked id,id]
+                           record today's quiz; advances lesson if gate passes
+  vimdrill --quiz-pool      questions for today's quiz (current lesson + review)
+  vimdrill --sync-files DIR
+                           write summary.json + lessons.json for the tracker page
+"""
+import datetime as dt
+import json
+import os
+import random
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+ROOT = Path(os.environ.get("VIM_MASTERY_ROOT", Path.home() / "vim-mastery"))
+STATE = ROOT / "state.json"
+DRILLS = ROOT / "drills"
+CURRICULUM = ROOT / "curriculum"
+LOG = ROOT / "log.jsonl"
+
+PASS_SCORE = 0.8
+REPEAT_PAR_FACTOR = 1.5
+QUIT_KEYS = 5  # ":wqa<CR>" is included in par
+
+RED, YEL, GRN, DIM, BOLD, RST = "\033[31m", "\033[33m", "\033[32m", "\033[2m", "\033[1m", "\033[0m"
+
+
+# ---------- data ----------
+
+def load_curriculum():
+    lessons = []
+    for f in sorted(CURRICULUM.glob("week*.json")):
+        week = json.loads(f.read_text())
+        for lesson in week["lessons"]:
+            lesson["week"] = week["week"]
+            lesson["week_title"] = week["title"]
+            lessons.append(lesson)
+    return lessons
+
+
+def lesson_by_id(lessons, lid):
+    return next((l for l in lessons if l["id"] == lid), None)
+
+
+def next_lesson_id(lessons, lid):
+    ids = [l["id"] for l in lessons]
+    i = ids.index(lid)
+    return ids[i + 1] if i + 1 < len(ids) else None
+
+
+def today():
+    return os.environ.get("VIM_MASTERY_TODAY") or dt.date.today().isoformat()
+
+
+def load_state():
+    if STATE.exists():
+        return json.loads(STATE.read_text())
+    lessons = load_curriculum()
+    return {
+        "start_date": today(),
+        "current_lesson": lessons[0]["id"],
+        "completed": [],
+        "attempts": {},
+        "days": {},
+        "misses": {},
+        "best": {},
+    }
+
+
+def save_state(state):
+    tmp = STATE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, indent=2) + "\n")
+    tmp.replace(STATE)
+
+
+def log(event):
+    with LOG.open("a") as f:
+        f.write(json.dumps({"ts": dt.datetime.now().isoformat(timespec="seconds"), **event}) + "\n")
+
+
+def day_record(state, date=None):
+    return state["days"].setdefault(date or today(), {})
+
+
+def is_weekend(date_str):
+    return dt.date.fromisoformat(date_str).weekday() >= 5
+
+
+def day_complete(rec):
+    return bool(rec.get("drill_passed") and rec.get("quiz_taken"))
+
+
+def streak(state):
+    """Consecutive completed weekdays. Weekends never break it; today only counts once done."""
+    d = dt.date.fromisoformat(today())
+    start = dt.date.fromisoformat(state["start_date"])
+    count = 0
+    first = True
+    while d >= start:
+        ds = d.isoformat()
+        rec = state["days"].get(ds, {})
+        if d.weekday() < 5:
+            if day_complete(rec):
+                count += 1
+            elif not first:
+                break
+        first = False
+        d -= dt.timedelta(days=1)
+    return count
+
+
+# ---------- drills ----------
+
+def drill_dir(lid):
+    return DRILLS / lid
+
+
+def load_drill(lid):
+    return json.loads((drill_dir(lid) / "drill.json").read_text())
+
+
+KEY_RE = re.compile(
+    r"<(?:(?:[CMSAD]-)+[^>]|(?:[CMSAD]-)*(?:Esc|CR|Enter|Return|NL|Space|Tab|BS|Del|Up|Down|Left|Right|"
+    r"Home|End|PageUp|PageDown|Insert|lt|Bar|Bslash|Leader|LocalLeader|F[0-9]{1,2}))>", re.IGNORECASE)
+
+
+def count_keys(notation):
+    """Keystrokes in <>-notation: <Esc>, <C-v>, <CR> count as one; other text counts per character."""
+    n, i = 0, 0
+    while i < len(notation):
+        m = KEY_RE.match(notation, i)
+        if m and (i == 0 or notation[i - 1] != "\\"):
+            i = m.end()
+        else:
+            i += 1
+        n += 1
+    return n
+
+
+def par(drill):
+    return count_keys(drill["solution"]) + QUIT_KEYS
+
+
+def count_logged_keys(path):
+    data = path.read_bytes() if path.exists() else b""
+    n, i = 0, 0
+    while i < len(data):
+        i += 3 if data[i] == 0x80 else 1  # K_SPECIAL + 2 bytes = one key
+        n += 1
+    return n
+
+
+CTRL_NAMES = {0x09: "<Tab>", 0x0A: "<NL>", 0x0D: "<CR>", 0x1B: "<Esc>", 0x7F: "<BS>"}
+TERMCAP_NAMES = {b"ku": "Up", b"kd": "Down", b"kl": "Left", b"kr": "Right", b"kb": "BS", b"kD": "Del",
+                 b"kI": "Insert", b"kh": "Home", b"@7": "End", b"kP": "PageUp", b"kN": "PageDown",
+                 **{b"k" + bytes([c]): f"F{n}" for n, c in enumerate(b"123456789;", 1)}}
+MOD_NAMES = ((0x02, "S"), (0x04, "C"), (0x08, "A"), (0x10, "M"), (0x80, "D"))
+
+
+def logged_route(path):
+    """The keylog from `nvim -w` in the same <>-notation as a drill solution."""
+    data = path.read_bytes() if path.exists() else b""
+    out, text, mods, i = [], bytearray(), 0, 0
+
+    def key(name):
+        nonlocal mods
+        prefix = "".join(f"{m}-" for bit, m in MOD_NAMES if mods & bit)
+        mods = 0
+        out.append(text.decode("utf-8", "replace").replace("<", "<lt>"))
+        text.clear()
+        out.append(f"<{prefix}{name}>")
+
+    while i < len(data):
+        b = data[i]
+        if b == 0x80 and i + 2 < len(data):
+            a, c = data[i + 1], data[i + 2]
+            i += 3
+            if a == 0xFC:  # KS_MODIFIER: applies to the next key
+                mods = c
+            elif a == 0xFE:  # KS_SPECIAL: an escaped 0x80 byte inside a multibyte character
+                text.append(0x80)
+            elif a == 0xFF:
+                key("Nul")
+            else:
+                key(TERMCAP_NAMES.get(bytes([a, c]), "?"))
+        else:
+            i += 1
+            if b in CTRL_NAMES:
+                key(CTRL_NAMES[b][1:-1])
+            elif b < 0x20:
+                key(f"C-{chr(b + 0x60)}")
+            elif mods:
+                key(chr(b))
+            else:
+                text.append(b)
+    out.append(text.decode("utf-8", "replace").replace("<", "<lt>"))
+    return "".join(out)
+
+
+def normalize(text):
+    return "\n".join(line.rstrip() for line in text.rstrip("\n").split("\n"))
+
+
+def compare_dirs(work, target):
+    bad = []
+    for t in sorted(target.rglob("*")):
+        if t.is_file():
+            w = work / t.relative_to(target)
+            if not w.exists() or normalize(w.read_text()) != normalize(t.read_text()):
+                bad.append(str(t.relative_to(target)))
+    return bad
+
+
+SCREEN_LUA = r"""
+-- Fixed-height work window for screen-motion rounds (H/M/L, Ctrl-d/u): the generator's model assumes these.
+function _G.VM_screen(win, h)
+  vim.api.nvim_win_set_height(win, h)
+  vim.wo[win].scrolloff, vim.wo[win].wrap, vim.wo[win].scroll = 0, false, math.floor(h / 2)
+  return vim.api.nvim_win_get_height(win) == h
+end
+"""
+
+LAYOUT_LUA = SCREEN_LUA + r"""
+local work_win = vim.api.nvim_get_current_win()
+local info, target, diff = _G.VM.info, _G.VM.target, _G.VM.diff
+if diff then
+  vim.cmd('rightbelow vsplit ' .. vim.fn.fnameescape(target))
+  vim.bo.readonly, vim.bo.modifiable, vim.bo.swapfile = true, false, false
+  vim.cmd('diffthis')
+  vim.api.nvim_set_current_win(work_win)
+  vim.cmd('diffthis')
+end
+vim.cmd('topleft split ' .. vim.fn.fnameescape(info))
+vim.bo.readonly, vim.bo.modifiable, vim.bo.swapfile = true, false, false
+vim.wo.number, vim.wo.spell, vim.wo.winfixheight = false, false, true
+vim.cmd('resize ' .. math.min(vim.fn.line('$'), 16))
+vim.api.nvim_set_current_win(work_win)
+if _G.VM.screen and not VM_screen(work_win, _G.VM.screen) then
+  vim.notify('Terminal too short: this round wants a ' .. _G.VM.screen .. '-row window, so par is off', vim.log.levels.WARN)
+end
+vim.cmd('normal! gg0')
+vim.api.nvim_create_autocmd('WinClosed', {
+  pattern = tostring(work_win),
+  callback = function() vim.schedule(function() vim.cmd('silent! wall') vim.cmd('qa!') end) end,
+})
+-- count real normal-mode presses of practiced keys in the work file (the keylog can't tell them from typed text)
+if _G.VM.practice then
+  -- a slow g ... i would time the mapping out and run the built-in gi uncounted; plain g waits for its key anyway
+  vim.o.timeout = false
+  local used = {}
+  for _, lhs in ipairs(_G.VM.practice) do
+    used[lhs] = 0
+    vim.keymap.set('n', lhs, function()
+      -- before the first insert there is no '^ and gi is plain i: that resumes nothing
+      if lhs ~= 'gi' or vim.api.nvim_buf_get_mark(0, '^')[1] > 0 then used[lhs] = used[lhs] + 1 end
+      return lhs
+    end, { expr = true, buffer = vim.api.nvim_win_get_buf(work_win) })
+  end
+  vim.api.nvim_create_autocmd('VimLeavePre', {
+    callback = function() vim.fn.writefile({ vim.json.encode(used) }, _G.VM.used) end,
+  })
+end
+"""
+
+
+def play(drill, src, title, prefix):
+    """Open src/start in nvim beside src/target.
+    Returns (keys, secs, mismatched files, work dir, route, presses of each practiced key or None if unknown)."""
+    work = Path(tempfile.mkdtemp(prefix=prefix))
+    shutil.copytree(src / "start", work, dirs_exist_ok=True)
+    keylog = work.parent / (work.name + ".keys")
+    info = work.parent / (work.name + ".info.txt")
+    usedf = work.parent / (work.name + ".used.json")
+    info.write_text(
+        f"{title}    par: {par(drill)} keys (incl. :wqa)\n"
+        + "-" * 60 + "\n"
+        + drill["instructions"].rstrip() + "\n"
+        + "-" * 60 + "\n"
+        + ("Left: your file. Right: target (diff highlights what's left).\n" if drill.get("diff", True) else "")
+        + "Finish with :wqa (saves every file and quits). Closing your file window also saves and quits.\n"
+    )
+    open_files = drill.get("open", ["main.txt"])
+    layout = work.parent / (work.name + ".lua")
+    layout.write_text(
+        "_G.VM = { info = %s, target = %s, diff = %s, screen = %s, practice = %s, used = %s }\n" % (
+            json.dumps(str(info)),
+            json.dumps(str(src / "target" / open_files[0])),
+            "true" if drill.get("diff", True) else "false",
+            int(drill["screen"]) if drill.get("screen") else "nil",
+            ("{ " + ", ".join(json.dumps(k) for k in drill["practice"]) + " }") if drill.get("practice") else "nil",
+            json.dumps(str(usedf)),
+        ) + LAYOUT_LUA
+    )
+    t0 = time.time()
+    subprocess.call(["nvim", "-w", str(keylog), *open_files, "-c", f"luafile {layout}"], cwd=work)
+    secs = int(time.time() - t0)
+    keys, route = count_logged_keys(keylog), logged_route(keylog)
+    bad = compare_dirs(work, src / "target")
+    # no file: nvim exited without VimLeavePre (crash, kill), so the presses are unknown
+    used = json.loads(usedf.read_text()) if usedf.exists() else (None if drill.get("practice") else {})
+    for f in (keylog, info, layout, usedf):
+        f.unlink(missing_ok=True)
+    return keys, secs, bad, work, route, used
+
+
+def run_edit_drill(lid, counts):
+    drill = load_drill(lid)
+    lesson = lesson_by_id(load_curriculum(), lid)
+    p = par(drill)
+    keys, secs, bad, work, _, _ = play(drill, drill_dir(lid), f"Lesson {lid} - {lesson['title']}", f"vimdrill-{lid}-")
+    passed = not bad
+    state = load_state()
+    attempt_no = state["attempts"].get(lid, 0)
+    repeat = counts and attempt_no >= 1
+    limit = int(p * REPEAT_PAR_FACTOR)
+    if passed and repeat and keys > limit:
+        passed = False
+        reason = f"repeat day: needs <= {limit} keys (1.5x par), you used {keys}"
+    else:
+        reason = "" if passed else "mismatch in: " + ", ".join(bad)
+    print()
+    if passed:
+        print(f"{GRN}{BOLD}PASS{RST}  {keys} keys (par {p})  {secs}s")
+        if keys <= p:
+            print(f"{GRN}At or under par. Nice.{RST}")
+        elif keys > p * 2:
+            print(f"{YEL}Over 2x par - re-read the lesson card (vimdrill --show) and look for a shorter way.{RST}")
+    else:
+        print(f"{RED}{BOLD}FAIL{RST}  {reason}  ({keys} keys, {secs}s)")
+        print(f"{DIM}Your attempt: {work}{RST}")
+        print("Run vimdrill again.")
+    log({"event": "drill", "lesson": lid, "counts": counts, "passed": passed, "keys": keys, "par": p, "secs": secs})
+    best = state["best"].get(lid)
+    if passed and (best is None or keys < best):
+        state["best"][lid] = keys
+    if counts:
+        rec = day_record(state)
+        rec["lesson"] = lid
+        rec["drill_runs"] = rec.get("drill_runs", 0) + 1
+        if passed:
+            rec["drill_passed"] = True
+            rec["keys"] = min(keys, rec.get("keys", keys))
+            rec["par"] = p
+    save_state(state)
+    if passed:
+        shutil.rmtree(work)
+    if counts and passed:
+        print(f"\nNext: run {BOLD}/vim-daily{RST} in Claude Code for the quiz (unlocks the next lesson).")
+    return passed
+
+
+def run_task_drill(lid, check_only):
+    drill = load_drill(lid)
+    if not check_only:
+        print(f"{BOLD}Lesson {lid} task{RST}\n")
+        print(drill["instructions"].rstrip())
+        print(f"\nWhen done, run: {BOLD}vimdrill --check{RST}")
+        return None
+    res = subprocess.run(["bash", str(drill_dir(lid) / "check.sh")], capture_output=True, text=True)
+    passed = res.returncode == 0
+    print((res.stdout + res.stderr).strip())
+    print(f"{GRN}{BOLD}PASS{RST}" if passed else f"{RED}{BOLD}NOT YET{RST}")
+    state = load_state()
+    rec = day_record(state)
+    rec["lesson"] = lid
+    if passed:
+        rec["drill_passed"] = True
+        print(f"\nNext: run {BOLD}/vim-daily{RST} in Claude Code for the quiz.")
+    save_state(state)
+    log({"event": "task", "lesson": lid, "passed": passed})
+    return passed
+
+
+def write_spec(spec, d):
+    """Lay out a drill spec ({"start": {...}, "target": {...}, ...}) as d/start, d/target; returns the drill."""
+    for part in ("start", "target"):
+        for name, text in spec[part].items():
+            f = d / part / name
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(text if text.endswith("\n") else text + "\n")
+    return {"open": ["main.txt"], **{k: v for k, v in spec.items() if k not in ("start", "target")}}
+
+
+def cmd_mix(seed=None):
+    """Practice rounds generated fresh from every unlocked lesson. Never touches the streak or the gate."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import mixgen
+    state = load_state()
+    lessons = load_curriculum()
+    unlocked = [lid for lid in state["completed"] + [state["current_lesson"]]
+                if lid in mixgen.GENERATORS or load_drill(lid).get("type", "edit") == "edit"]
+    if not unlocked:
+        sys.exit("nothing to mix yet - run vimdrill")
+    seed = random.randrange(100000) if seed is None else seed
+    rng = random.Random(seed)
+    current = state["current_lesson"] if state["current_lesson"] in unlocked else unlocked[-1]
+    rounds = mixgen.pick_rounds(rng, unlocked, current, state["misses"])
+    print(f"{BOLD}Mix #{seed}{RST}: lessons {', '.join(rounds)}  {DIM}(practice only; replay with vimdrill --mix {seed}){RST}")
+    base = Path(tempfile.mkdtemp(prefix="vimmix-"))
+    results = []
+    for n, lid in enumerate(rounds, 1):
+        lesson = lesson_by_id(lessons, lid)
+        if lid in mixgen.GENERATORS:
+            src = base / f"round{n}"
+            drill = write_spec(mixgen.GENERATORS[lid](rng), src)
+        else:
+            src, drill = drill_dir(lid), load_drill(lid)
+        p = par(drill)
+        title = f"Mix {n}/{len(rounds)} - lesson {lid} {lesson['title']}" + ("" if lid in mixgen.GENERATORS else " (fixed drill)")
+        input(f"\nRound {n}/{len(rounds)}: {lid} {lesson['title']}  par {p}.  Enter to start ")
+        while True:
+            keys, secs, bad, work, route, used = play(drill, src, title, f"vimmix-{lid}-")
+            practice = drill.get("practice", {})
+            skipped = [k for k in practice if used is not None and not used.get(k)]
+            if not bad and not skipped:
+                shutil.rmtree(work)
+                print(f"{GRN}{BOLD}PASS{RST}  {keys} keys (par {p})  {secs}s")
+                if used is None:
+                    print(f"{YEL}nvim didn't report whether you pressed {', '.join(practice)}, so it wasn't checked.{RST}")
+                if keys > p and lid in mixgen.GENERATORS:
+                    print(f"{DIM}par route:{RST} {drill['solution']}:wqa<CR>")
+                    print(f"{DIM}your route:{RST} {route}")
+                results.append({"lesson": lid, "keys": keys, "par": p, "passed": True})
+                break
+            if bad:
+                print(f"{RED}{BOLD}MISMATCH{RST} in {', '.join(bad)}  ({keys} keys)  {DIM}{work}{RST}")
+                if skipped:
+                    print(f"{YEL}Also: this round needs {', '.join(skipped)}, and you didn't use it the way the instructions say.{RST}")
+            else:
+                shutil.rmtree(work)
+                print(f"{YEL}{BOLD}NOT PASSED{RST}  the file matches ({keys} keys), but you didn't use {', '.join(skipped)} "
+                      f"the way this round needs.")
+                for k in skipped:
+                    print(f"  {practice[k]}")
+                print(f"{DIM}par route:{RST} {drill['solution']}:wqa<CR>")
+                print(f"{DIM}your route:{RST} {route}")
+            choice = input("[r]etry this round, [s]kip it, [q]uit the mix? ").strip().lower()[:1]
+            if choice != "r":
+                results.append({"lesson": lid, "keys": keys, "par": p, "passed": False})
+                break
+        if results[-1]["passed"] is False and choice == "q":
+            break
+    shutil.rmtree(base, ignore_errors=True)
+    done = [r for r in results if r["passed"]]
+    print(f"\n{BOLD}Mix #{seed} done{RST}: {len(done)}/{len(rounds)} rounds")
+    for r in results:
+        mark = f"{GRN}✔{RST}" if r["passed"] else f"{RED}✘{RST}"
+        hint = f"  {YEL}over 2x par - vimdrill --show {r['lesson']}{RST}" if r["passed"] and r["keys"] > 2 * r["par"] else ""
+        print(f"  {mark} {r['lesson']:5} {r['keys']:4} keys  par {r['par']}{hint}")
+    if done:
+        keys, p = sum(r["keys"] for r in done), sum(r["par"] for r in done)
+        print(f"  total {keys} keys vs par {p} ({keys / p:.1f}x)")
+    log({"event": "mix", "seed": seed, "rounds": results})
+
+
+# ---------- commands ----------
+
+def cmd_status():
+    if not STATE.exists():
+        print(f"{YEL}Vim:{RST} not started - run {BOLD}vimdrill{RST} for lesson 1.1")
+        return
+    state = load_state()
+    lessons = load_curriculum()
+    lid = state["current_lesson"]
+    lesson = lesson_by_id(lessons, lid)
+    rec = state["days"].get(today(), {})
+    s = streak(state)
+    title = f'{lid} "{lesson["title"]}"' if lesson else "curriculum complete"
+    if lesson is None:
+        print(f"{GRN}Vim:{RST} curriculum complete - streak {s}. Keep it up with vimdrill --mix")
+    elif day_complete(rec):
+        print(f"{GRN}Vim ✔{RST} streak {s} · done today · next: {title} · extra: vimdrill --mix")
+    elif rec.get("drill_passed"):
+        print(f"{YEL}Vim ◐{RST} drill passed · run {BOLD}/vim-daily{RST} in Claude for the quiz · streak {s}")
+    elif is_weekend(today()):
+        print(f"{DIM}Vim · weekend (optional): vimdrill --mix · streak {s}{RST}")
+    else:
+        print(f"{RED}Vim ✘{RST} {title} not done · run {BOLD}vimdrill{RST} · streak {s}")
+
+
+def cmd_show(lid=None):
+    lessons = load_curriculum()
+    state = load_state()
+    lesson = lesson_by_id(lessons, lid or state["current_lesson"])
+    if not lesson:
+        sys.exit("no such lesson")
+    print(f"{BOLD}Week {lesson['week']}: {lesson['week_title']}{RST}")
+    print(f"{BOLD}Lesson {lesson['id']}: {lesson['title']}{RST}\n")
+    w = max(len(c["keys"]) for c in lesson["concepts"])
+    for c in lesson["concepts"]:
+        print(f"  {GRN}{c['keys'].ljust(w)}{RST}  {c['desc']}")
+    if lesson.get("tip"):
+        print(f"\n{YEL}Tip:{RST} {lesson['tip']}")
+
+
+def cmd_state():
+    state = load_state()
+    lessons = load_curriculum()
+    lid = state["current_lesson"]
+    out = {
+        "today": today(),
+        "weekend": is_weekend(today()),
+        "streak": streak(state),
+        "current_lesson": lesson_by_id(lessons, lid),
+        "today_record": state["days"].get(today(), {}),
+        "attempts_on_current": state["attempts"].get(lid, 0),
+        "completed": state["completed"],
+        "misses": state["misses"],
+        "recent_days": dict(sorted(state["days"].items())[-14:]),
+        "total_lessons": len(lessons),
+    }
+    print(json.dumps(out, indent=2))
+
+
+def cmd_record_quiz(score, missed, asked):
+    state = load_state()
+    lessons = load_curriculum()
+    rec = day_record(state)
+    lid = state["current_lesson"]
+    if not rec.get("drill_passed"):
+        sys.exit("refused: today's drill hasn't passed yet - run vimdrill first")
+    if rec.get("quiz_taken"):
+        sys.exit("refused: quiz already recorded today")
+    rec["quiz_taken"] = True
+    rec["quiz_score"] = round(score, 3)
+    for qid in asked:
+        if qid in state["misses"] and qid not in missed:
+            m = state["misses"][qid]
+            m["streak_right"] = m.get("streak_right", 0) + 1
+            if m["streak_right"] >= 2:
+                del state["misses"][qid]
+    for qid in missed:
+        m = state["misses"].setdefault(qid, {"count": 0})
+        m["count"] += 1
+        m["last"] = today()
+        m["streak_right"] = 0
+    state["attempts"][lid] = state["attempts"].get(lid, 0) + 1
+    advanced = None
+    if score >= PASS_SCORE:
+        if lid not in state["completed"]:
+            state["completed"].append(lid)
+        nxt = next_lesson_id(lessons, lid)
+        state["current_lesson"] = nxt or lid
+        advanced = nxt or "DONE"
+    rec["advanced_to"] = advanced
+    save_state(state)
+    log({"event": "quiz", "lesson": lid, "score": score, "missed": missed, "advanced": advanced})
+    print(json.dumps({"lesson": lid, "score": score, "passed_gate": advanced is not None,
+                      "advanced_to": advanced, "streak": streak(state)}))
+
+
+def today_status(state):
+    rec = state["days"].get(today(), {})
+    if day_complete(rec):
+        return "done"
+    if rec.get("drill_passed"):
+        return "quiz"
+    return "weekend" if is_weekend(today()) else "todo"
+
+
+def cmd_sync_files(out_dir):
+    state = load_state()
+    lessons = load_curriculum()
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    days = dict(sorted(state["days"].items())[-40:])
+    quiz_by_lesson = {}
+    for rec in state["days"].values():
+        if rec.get("quiz_taken") and rec.get("lesson"):
+            quiz_by_lesson[rec["lesson"]] = rec.get("quiz_score")
+    summary = {
+        "updated": dt.datetime.now().isoformat(timespec="minutes"),
+        "start_date": state["start_date"],
+        "streak": streak(state),
+        "current_lesson": state["current_lesson"],
+        "completed_count": len(state["completed"]),
+        "total_lessons": len(lessons),
+        "today": {"date": today(), "status": today_status(state),
+                  "quiz_score": state["days"].get(today(), {}).get("quiz_score")},
+        "days": days,
+    }
+    items = []
+    for l in lessons:
+        lid = l["id"]
+        status = "done" if lid in state["completed"] else "current" if lid == state["current_lesson"] else "locked"
+        item = {"id": lid, "week": l["week"], "week_title": l["week_title"], "title": l["title"], "status": status}
+        if status != "locked":
+            drill = load_drill(lid)
+            item.update(concepts=l["concepts"], tip=l.get("tip", ""),
+                        par=par(drill) if drill.get("type", "edit") == "edit" else None,
+                        best=state["best"].get(lid), quiz_score=quiz_by_lesson.get(lid),
+                        attempts=state["attempts"].get(lid, 0))
+        items.append(item)
+    (out / "summary.json").write_text(json.dumps(summary, indent=1))
+    (out / "lessons.json").write_text(json.dumps({"items": items}, indent=1))
+    print(json.dumps({"summary": str(out / "summary.json"), "lessons": str(out / "lessons.json"),
+                      "tracker_url": (ROOT / "tracker_url").read_text().strip() if (ROOT / "tracker_url").exists() else None}))
+
+
+def cmd_quiz_pool():
+    state = load_state()
+    lessons = load_curriculum()
+    by_id = {q["id"]: q for l in lessons for q in l["quiz"]}
+    cur = lesson_by_id(lessons, state["current_lesson"])
+    misses = sorted(state["misses"].items(), key=lambda kv: (-kv[1]["count"], kv[1].get("last", "")))
+    review = [by_id[qid] for qid, _ in misses if qid in by_id][:3]
+    done = [lesson_by_id(lessons, lid) for lid in state["completed"]]
+    pool = [q for l in done if l for q in l["quiz"] if q not in review]
+    random.shuffle(pool)
+    review += pool[:max(1, 4 - len(review))]
+    print(json.dumps({"lesson": {"id": cur["id"], "title": cur["title"]},
+                      "current": random.sample(cur["quiz"], 4), "review": review[:4]}, indent=1))
+
+
+def main(argv):
+    if not argv:
+        state = load_state()
+        if not STATE.exists():
+            save_state(state)
+        lid = state["current_lesson"]
+        drill = load_drill(lid)
+        if drill.get("type") == "task":
+            run_task_drill(lid, check_only=False)
+        else:
+            if state["days"].get(today(), {}).get("drill_passed"):
+                print(f"{DIM}Already passed today - this run is practice.{RST}")
+                run_edit_drill(lid, counts=False)
+            else:
+                run_edit_drill(lid, counts=True)
+        return
+    a = argv[0]
+    if a in ("-h", "--help"):
+        print(__doc__)
+    elif a == "--status":
+        cmd_status()
+    elif a == "--show":
+        cmd_show(argv[1] if len(argv) > 1 else None)
+    elif a == "--state":
+        cmd_state()
+    elif a == "--check":
+        run_task_drill(load_state()["current_lesson"], check_only=True)
+    elif a == "--review":
+        state = load_state()
+        done = [l for l in state["completed"] if load_drill(l).get("type", "edit") == "edit"]
+        if not done:
+            sys.exit("nothing completed yet - run vimdrill")
+        run_edit_drill(random.choice(done), counts=False)
+    elif a == "--mix":
+        cmd_mix(int(argv[1]) if len(argv) > 1 else None)
+    elif a == "--quiz-pool":
+        cmd_quiz_pool()
+    elif a == "--sync-files":
+        cmd_sync_files(argv[1])
+    elif a == "--record-quiz":
+        score = float(argv[1])
+        opts = dict(zip(argv[2::2], argv[3::2]))
+        split = lambda s: [x for x in (s or "").split(",") if x]
+        cmd_record_quiz(score, split(opts.get("--missed")), split(opts.get("--asked")))
+    else:
+        state = load_state()
+        if a not in state["completed"] + [state["current_lesson"]]:
+            sys.exit(f"lesson {a} isn't unlocked yet")
+        run_edit_drill(a, counts=False)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

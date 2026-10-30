@@ -1,0 +1,3 @@
+write code
+test code
+ship it

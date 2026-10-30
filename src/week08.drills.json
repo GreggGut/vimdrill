@@ -1,0 +1,37 @@
+[
+  {
+    "id": "8.1",
+    "instructions": "1. Delete the debug/verbose/trace lines with one range: :4,6d\n2. Move the port line above host: :3m1\n3. Between [database] and [cache], change admin to root:\n   gg then :/database/,/cache/s/admin/root/g\n4. Copy the name line to the end of the file (:t$).\n5. Comment out the last three lines: :$-2,$s/^/# /\n6. Remove the spaces around = in the whole file (%).",
+    "solution": ":4,6d<CR>:3m1<CR>gg:/database/,/cache/s/admin/root/g<CR>:/name/t$<CR>:$-2,$s/^/# /<CR>:%s/ = /=/g<CR>",
+    "start": {"main.txt": "# server.conf\nhost = localhost\nport = 8080\ndebug = true\nverbose = true\ntrace = true\n[database]\nuser = admin\npass = admin\nname = app\n[cache]\nttl = 60\nsize = 100"},
+    "target": {"main.txt": "# server.conf\nport=8080\nhost=localhost\n[database]\nuser=root\npass=root\nname=app\n[cache]\n# ttl=60\n# size=100\n# name=app"}
+  },
+  {
+    "id": "8.2",
+    "instructions": "Clean up the log with :g and :v:\n1. Delete all blank lines: :g/^$/d\n2. Keep only INFO and ERROR lines: :v/INFO\\|ERROR/d\n3. Move every ERROR line to the end: :g/ERROR/m$\n4. Append \" !\" to every ERROR line: :g/ERROR/norm A !",
+    "solution": ":g/^$/d<CR>:v/INFO\\|ERROR/d<CR>:g/ERROR/m$<CR>:g/ERROR/norm A !<CR>",
+    "start": {"main.txt": "2026-10-01 09:00 INFO  service started\n2026-10-01 09:00 DEBUG cache warm\n\n2026-10-01 09:01 ERROR db timeout\n2026-10-01 09:01 INFO  GET /users 200\n2026-10-01 09:02 TRACE retry 1\n\n2026-10-01 09:03 ERROR disk full\n2026-10-01 09:03 INFO  GET /health 200\n2026-10-01 09:04 DEBUG gc pause 12ms"},
+    "target": {"main.txt": "2026-10-01 09:00 INFO  service started\n2026-10-01 09:01 INFO  GET /users 200\n2026-10-01 09:03 INFO  GET /health 200\n2026-10-01 09:01 ERROR db timeout !\n2026-10-01 09:03 ERROR disk full !"}
+  },
+  {
+    "id": "8.3",
+    "instructions": "1. Sort the fruit lines and drop the duplicate: :2,6sort u\n2. Indent them by two spaces: :2,5norm I  (two spaces)\n3. Add a comma to each: :2,5norm A,\n4. Sort the ranking numerically. Use a search range:\n   :/ranking/+1,$sort n",
+    "solution": ":2,6sort u<CR>:2,5norm I  <CR>:2,5norm A,<CR>:/ranking/+1,$sort n<CR>",
+    "start": {"main.txt": "const fruits = [\n'pear'\n'apple'\n'banana'\n'apple'\n'cherry'\n];\n\n// ranking\n10 alice\n9 bob\n100 carol\n25 dave"},
+    "target": {"main.txt": "const fruits = [\n  'apple',\n  'banana',\n  'cherry',\n  'pear',\n];\n\n// ranking\n9 bob\n10 alice\n25 dave\n100 carol"}
+  },
+  {
+    "id": "8.4",
+    "instructions": "1. Sort the three data rows with the shell: :2,4!sort\n2. Uppercase the header with the shell: :1!tr a-z A-Z\n3. Bump the patch version 1.4.9 to 1.4.10 (put the cursor on 9, then Ctrl-a).\n4. Raise retries from 3 to 5 (2 Ctrl-a).\n5. Renumber the steps 1, 2, 3: select the test and deploy lines with V, then g Ctrl-a.",
+    "solution": ":2,4!sort<CR>:1!tr a-z A-Z<CR>/version<CR>$<C-a>j2<C-a>jjVjg<C-a>",
+    "start": {"main.txt": "id,name,city\n3,carol,oslo\n1,alice,rome\n2,bob,paris\n\nversion = 1.4.9\nretries = 3\nstep 1: build\nstep 1: test\nstep 1: deploy"},
+    "target": {"main.txt": "ID,NAME,CITY\n1,alice,rome\n2,bob,paris\n3,carol,oslo\n\nversion = 1.4.10\nretries = 5\nstep 1: build\nstep 2: test\nstep 3: deploy"}
+  },
+  {
+    "id": "8.5",
+    "instructions": "Review:\n1. Sort the five task lines (TODOs end up first): :2,6sort\n2. Append \" !\" to the three TODO lines with :norm over a range.\n3. Copy the version line to the very top (:$t0), then prefix that copy with \"# previous \".\n4. Bump the version at the bottom to 2.0.10 with Ctrl-a.",
+    "solution": ":2,6sort<CR>:2,4norm A !<CR>:$t0<CR>:1s/^/# previous /<CR>G$<C-a>",
+    "start": {"main.txt": "## Tasks\nTODO fix login bug\ndone set up repo\nTODO add tests\ndone ci pipeline\nTODO write docs\n\n## Release\nversion: 2.0.9"},
+    "target": {"main.txt": "# previous version: 2.0.9\n## Tasks\nTODO add tests !\nTODO fix login bug !\nTODO write docs !\ndone ci pipeline\ndone set up repo\n\n## Release\nversion: 2.0.10"}
+  }
+]

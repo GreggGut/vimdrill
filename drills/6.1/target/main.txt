@@ -1,0 +1,9 @@
+Version: 2.4.1
+Release 2.4.1 is out.
+Notes about the release
+More notes here
+
+## Collected TODOs
+TODO: write tests
+TODO: update changelog
+TODO: tag the release

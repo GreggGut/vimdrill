@@ -1,0 +1,10 @@
+# previous version: 2.0.9
+## Tasks
+TODO add tests !
+TODO fix login bug !
+TODO write docs !
+done ci pipeline
+done set up repo
+
+## Release
+version: 2.0.10

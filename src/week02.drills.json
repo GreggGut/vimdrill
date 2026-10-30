@@ -1,0 +1,37 @@
+[
+  {
+    "id": "2.1",
+    "instructions": "Clean up the function using d + a motion:\n1. Remove the debug_flag parameter (put the cursor on the comma, de).\n2. Remove the TODO comment after 0 (D).\n3. Delete the print line (dd).\n4. Delete everything below return (dG from the blank line).",
+    "solution": "wwwwdej^wwlDjjddjjdG",
+    "start": {"main.txt": "def total(items, debug_flag):\n    result = 0  # TODO remove this comment\n    for item in items:\n        print(\"debug\", item)\n        result += item.price\n    return result\n\n# old code\nprint(total([]))\nprint(\"done\")"},
+    "target": {"main.txt": "def total(items):\n    result = 0\n    for item in items:\n        result += item.price\n    return result"}
+  },
+  {
+    "id": "2.2",
+    "instructions": "Change the CSS values with c + a motion:\n1. red -> rebeccapurple (cw).\n2. white -> #fafafa.\n3. 1px -> 2px with s, solid -> dashed.\n4. size -> family, then C to replace the value with: Inter, sans-serif;\n5. Replace the whole margin line with: padding: 8px; (cc).",
+    "solution": "wwcwrebeccapurple<Esc>j$bcw#fafafa<Esc>j0wws2<Esc>wcwdashed<Esc>j0wwcwfamily<Esc>wwCInter, sans-serif;<Esc>jccpadding: 8px;<Esc>",
+    "start": {"main.txt": "color: red;\nbackground-color: white;\nborder: 1px solid black;\nfont-size: 12px;\nmargin: 0 auto 0 auto;"},
+    "target": {"main.txt": "color: rebeccapurple;\nbackground-color: #fafafa;\nborder: 2px dashed black;\nfont-family: Inter, sans-serif;\npadding: 8px;"}
+  },
+  {
+    "id": "2.3",
+    "instructions": "Yank and put:\n1. Fix teh -> the by swapping two letters (xp).\n2. Swap the Second/First step lines (ddp).\n3. Duplicate the Third step line (yyp) and change the copy to Fourth.\n4. Yank the word localhost (yw) and put it between the empty quotes on the last line (P).",
+    "solution": "lxpjddpjyypwcwFourth<Esc>j0wwwywjj$P",
+    "start": {"main.txt": "teh quick fix\n- Second step\n- First step\n- Third step\nhost = \"localhost\"\nport = 8080\nallowed = \"\""},
+    "target": {"main.txt": "the quick fix\n- First step\n- Second step\n- Third step\n- Fourth step\nhost = \"localhost\"\nport = 8080\nallowed = \"localhost\""}
+  },
+  {
+    "id": "2.4",
+    "instructions": "Counts and the dot command:\n1. Add ; to the end of the first let line, then use j and . for the other three.\n2. Delete the three DEBUG lines in one go (3dd).\n3. Delete the three OLD words in one go (d3w).",
+    "solution": "A;<Esc>j.j.j.j3dd0wwd3w",
+    "start": {"main.txt": "let a = 1\nlet b = 2\nlet c = 3\nlet d = 4\nDEBUG one\nDEBUG two\nDEBUG three\ncall(OLD OLD OLD a, b, c, d)"},
+    "target": {"main.txt": "let a = 1;\nlet b = 2;\nlet c = 3;\nlet d = 4;\ncall(a, b, c, d)"}
+  },
+  {
+    "id": "2.5",
+    "instructions": "Review: make the left side match the right.\n- Remove the unused parameter (6w then de).\n- var -> const.\n- Delete both console.log lines with one command.\n- Fix mesage.\n- Add the greet call below the closing brace.",
+    "solution": "6wdej^cwconst<Esc>j2ddwcwmessage<Esc>jogreet(\"Ada\", \"Hello\");<Esc>",
+    "start": {"main.txt": "function greet(name, greeting, unused) {\n  var message = greeting + \", \" + name;\n  console.log(\"debug 1\");\n  console.log(\"debug 2\");\n  return mesage;\n}"},
+    "target": {"main.txt": "function greet(name, greeting) {\n  const message = greeting + \", \" + name;\n  return message;\n}\ngreet(\"Ada\", \"Hello\");"}
+  }
+]

@@ -1,0 +1,111 @@
+{
+  "week": 10,
+  "title": "Make it yours",
+  "goal": "Own your Neovim config: Lua instead of Vimscript, your own leader mappings, sane options, and a modern plugin manager with a fuzzy finder.",
+  "lessons": [
+    {
+      "id": "10.1",
+      "title": "Your config in Lua: init.lua",
+      "concepts": [
+        {"keys": "~/.config/nvim/init.lua", "desc": "Lua entry point. Neovim refuses to start cleanly if init.vim and init.lua both exist."},
+        {"keys": "vim.opt.x = v", "desc": "Lua for `set x=v`. Booleans: vim.opt.number = true. Lists: vim.opt.clipboard = 'unnamedplus'."},
+        {"keys": "vim.o / vim.bo / vim.wo", "desc": "plain option access: global / buffer-local / window-local values."},
+        {"keys": "vim.cmd([[...]])", "desc": "run Vimscript from Lua. Handy while you migrate piece by piece."},
+        {"keys": ":checkhealth", "desc": "diagnose your setup (providers, clipboard, plugins)."},
+        {"keys": ":set x?  /  :verbose set x?", "desc": "show an option's value / and which file last set it."}
+      ],
+      "tip": "Migrate in small steps and restart often. If startup breaks, `nvim --clean` gives you a working editor to fix the config with.",
+      "quiz": [
+        {"id": "10.1-q1", "q": "What is the Lua equivalent of `set expandtab`?", "a": "vim.opt.expandtab = true (vim.o.expandtab = true also works)."},
+        {"id": "10.1-q2", "q": "Where does Neovim look for a Lua config on Linux?", "a": "~/.config/nvim/init.lua (stdpath('config') .. '/init.lua')."},
+        {"id": "10.1-q3", "q": "What happens if both init.vim and init.lua exist?", "a": "Neovim reports a conflicting-configs error (E5422) and loads only one of them. Keep just one."},
+        {"id": "10.1-q4", "q": "How do you run a line of Vimscript from Lua?", "a": "vim.cmd('...') or vim.cmd([[...]])"},
+        {"id": "10.1-q5", "q": "How do you find out which file last set 'tabstop'?", "a": ":verbose set tabstop?"},
+        {"id": "10.1-q6", "q": "Your config is broken and nvim errors on start. How do you open nvim without it?", "a": "nvim --clean (or nvim -u NONE)"}
+      ]
+    },
+    {
+      "id": "10.2",
+      "title": "Leader key and mappings",
+      "concepts": [
+        {"keys": "vim.g.mapleader = ' '", "desc": "make Space your leader. Set it before any mapping that uses <leader>."},
+        {"keys": "vim.keymap.set(mode, lhs, rhs, opts)", "desc": "create a mapping. Non-recursive by default. opts: { desc = '...', silent = true }."},
+        {"keys": "<cmd>...<CR>", "desc": "run a command from a mapping without changing mode or flashing the command line."},
+        {"keys": ":nohlsearch", "desc": "clear search highlighting until the next search. A classic <Esc> mapping."},
+        {"keys": ":map / :nmap <leader>", "desc": "list mappings (all / normal-mode ones starting with leader)."},
+        {"keys": ":verbose nmap <lhs>", "desc": "show a mapping and where it was defined."}
+      ],
+      "tip": "Map things you do dozens of times a day, under a mnemonic: <leader>w write, <leader>q quit, <leader>f... find. Use `desc` so the mappings document themselves.",
+      "quiz": [
+        {"id": "10.2-q1", "q": "Make Space the leader key in Lua.", "a": "vim.g.mapleader = ' '"},
+        {"id": "10.2-q2", "q": "Map <leader>w in normal mode to save the file.", "a": "vim.keymap.set('n', '<leader>w', '<cmd>write<CR>')"},
+        {"id": "10.2-q3", "q": "Why put mapleader at the very top of init.lua?", "a": "<leader> is resolved when a mapping is defined. Mappings made before mapleader is set use the old leader (backslash)."},
+        {"id": "10.2-q4", "q": "Why use <cmd>...<CR> rather than :...<CR> in a mapping?", "a": "<cmd> runs the command directly: no mode change, no command-line flash, and it works the same in any mode."},
+        {"id": "10.2-q5", "q": "How do you see where a normal-mode mapping for `gx` was defined?", "a": ":verbose nmap gx"},
+        {"id": "10.2-q6", "q": "Is vim.keymap.set recursive (like :map) or not (like :noremap) by default?", "a": "Non-recursive (noremap) by default. Pass { remap = true } to change that."}
+      ]
+    },
+    {
+      "id": "10.3",
+      "title": "Options and autocommands that pay off",
+      "concepts": [
+        {"keys": "relativenumber", "desc": "line numbers relative to the cursor, so counts like 7j or d4k need no arithmetic."},
+        {"keys": "scrolloff=8", "desc": "keep 8 lines of context above and below the cursor."},
+        {"keys": "undofile", "desc": "keep undo history after closing the file."},
+        {"keys": "ignorecase + smartcase", "desc": "searches ignore case unless you type an uppercase letter."},
+        {"keys": "splitright / splitbelow", "desc": "new splits open to the right / below, where you're looking."},
+        {"keys": "nvim_create_autocmd(event, {...})", "desc": "run code on events. TextYankPost + vim.hl.on_yank() briefly highlights what you yanked."},
+        {"keys": "nvim_create_augroup(name, {clear=true})", "desc": "group autocmds so re-sourcing the config doesn't duplicate them."}
+      ],
+      "tip": "Relative numbers plus counts beat hjkl spam: look at the gutter, type 6↓ (or 6j). That's two keys, every time.",
+      "quiz": [
+        {"id": "10.3-q1", "q": "With ignorecase and smartcase on, does /Foo match `foo`?", "a": "No. An uppercase letter in the pattern makes the search case-sensitive."},
+        {"id": "10.3-q2", "q": "What does 'scrolloff' do?", "a": "Keeps that many lines visible above and below the cursor when scrolling."},
+        {"id": "10.3-q3", "q": "Which option keeps undo history after you close and reopen a file?", "a": "undofile"},
+        {"id": "10.3-q4", "q": "Which event fires after a yank, and which function highlights the yanked text?", "a": "TextYankPost; vim.hl.on_yank()"},
+        {"id": "10.3-q5", "q": "Why put autocmds in an augroup with clear = true?", "a": "Re-sourcing the config then replaces them instead of adding duplicates."},
+        {"id": "10.3-q6", "q": "Which two options make :split open below and :vsplit open to the right?", "a": "splitbelow and splitright"}
+      ]
+    },
+    {
+      "id": "10.4",
+      "title": "lazy.nvim and telescope",
+      "concepts": [
+        {"keys": "lazy.nvim", "desc": "plugin manager: bootstrap it from init.lua, then list plugins as specs, e.g. { 'nvim-telescope/telescope.nvim', dependencies = {...} }."},
+        {"keys": ":Lazy", "desc": "plugin UI: install (I), update (U), sync (S), profile startup (P)."},
+        {"keys": "telescope find_files", "desc": "fuzzy-find files by name in the current project."},
+        {"keys": "telescope live_grep", "desc": "search file contents as you type (uses ripgrep)."},
+        {"keys": "telescope buffers / help_tags", "desc": "jump between open buffers / search :help."},
+        {"keys": "Ctrl-n / Ctrl-p, Ctrl-x / Ctrl-v (telescope)", "desc": "next/previous result; open the result in a split / vsplit."}
+      ],
+      "tip": "Neovim 0.12 also has a built-in plugin manager, vim.pack (:help vim.pack). lazy.nvim is still the most common choice in examples, so it's the one you learn first.",
+      "quiz": [
+        {"id": "10.4-q1", "q": "Which command opens lazy.nvim's UI?", "a": ":Lazy"},
+        {"id": "10.4-q2", "q": "Which external tool does telescope's live_grep need?", "a": "ripgrep (rg)"},
+        {"id": "10.4-q3", "q": "Write a mapping: <leader>ff runs telescope find_files.", "a": "vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files) (or '<cmd>Telescope find_files<CR>')"},
+        {"id": "10.4-q4", "q": "In a telescope picker, how do you open the selected file in a vertical split?", "a": "Ctrl-v"},
+        {"id": "10.4-q5", "q": "Where does lazy.nvim install plugins by default?", "a": "~/.local/share/nvim/lazy/ (stdpath('data') .. '/lazy')"},
+        {"id": "10.4-q6", "q": "How do you see which plugins slow down startup?", "a": ":Lazy profile (or P in the :Lazy UI); also nvim --startuptime file.log"}
+      ]
+    },
+    {
+      "id": "10.5",
+      "title": "Week 10 review: Vimscript to Lua, fast",
+      "concepts": [
+        {"keys": ":%s/\\(...\\)/...\\1/", "desc": "capture groups turn repetitive config lines into Lua in one command."},
+        {"keys": "set x / set x=v", "desc": "→ vim.opt.x = true / vim.opt.x = v"},
+        {"keys": "nnoremap lhs rhs", "desc": "→ vim.keymap.set('n', 'lhs', 'rhs')"},
+        {"keys": "\\S\\+ / \\w\\+", "desc": "regex: a run of non-space characters / of word characters."}
+      ],
+      "tip": "When a dozen lines need the same change, write one substitution (or one macro), not twelve edits.",
+      "quiz": [
+        {"id": "10.5-q1", "q": "Convert every `set foo` line (no value) into `vim.opt.foo = true` with one command.", "a": ":%s/^set \\(\\w\\+\\)$/vim.opt.\\1 = true/"},
+        {"id": "10.5-q2", "q": "Lua: map Esc in normal mode to clear search highlighting.", "a": "vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')"},
+        {"id": "10.5-q3", "q": "Lua: turn on relative line numbers.", "a": "vim.opt.relativenumber = true"},
+        {"id": "10.5-q4", "q": "What does \\S\\+ match in a Vim regex?", "a": "One or more non-whitespace characters."},
+        {"id": "10.5-q5", "q": "Which command shows lazy.nvim's plugin list and status?", "a": ":Lazy"},
+        {"id": "10.5-q6", "q": "Which built-in function briefly highlights yanked text?", "a": "vim.hl.on_yank()"}
+      ]
+    }
+  ]
+}

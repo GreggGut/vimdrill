@@ -1,0 +1,4 @@
+url = "https://example.com/api/v2/users?id=7"
+print("Hello, Vim!")
+total = (price * quantity) + tax
+path = /usr/local/bin/tool.py

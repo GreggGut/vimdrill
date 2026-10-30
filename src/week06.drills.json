@@ -1,0 +1,57 @@
+[
+  {
+    "id": "6.1",
+    "instructions": "1. Yank the version 2.4.1 (yE), then replace PLACEHOLDER with it: diw, then \"0P (the yank register survives the delete).\n2. Move the three TODO lines under \"## Collected TODOs\": delete the first with \"add, the others with \"Add (capital = append), then paste with \"ap.",
+    "solution": "WyEj0wdiw\"0Pj\"addj\"Addj\"AddG\"ap",
+    "start": {
+      "main.txt": "Version: 2.4.1\nRelease PLACEHOLDER is out.\nTODO: write tests\nNotes about the release\nTODO: update changelog\nMore notes here\nTODO: tag the release\n\n## Collected TODOs"
+    },
+    "target": {
+      "main.txt": "Version: 2.4.1\nRelease 2.4.1 is out.\nNotes about the release\nMore notes here\n\n## Collected TODOs\nTODO: write tests\nTODO: update changelog\nTODO: tag the release"
+    }
+  },
+  {
+    "id": "6.2",
+    "instructions": "1. Yank billing-api into register a (\"ayE) and 9090 into the unnamed register (yE).\n2. Delete the JUNK line with the black hole register (\"_dd) so the unnamed register keeps 9090.\n3. Fill in the blanks from insert mode with Ctrl-r: 9090 after localhost: (Ctrl-r \"), billing-api after name = (Ctrl-r a), and 300 after timeout_seconds = (Ctrl-r =60*5).",
+    "solution": "f=l\"ayEj0f=lyEj\"_dd$F:a<C-r>\"<Esc>jA<C-r>a<Esc>jA<C-r>=60*5<CR><Esc>",
+    "start": {
+      "main.txt": "SERVICE_NAME=billing-api\nPORT=9090\nJUNK LINE - delete me with the black hole register\nurl = http://localhost:/health\nname = \ntimeout_seconds = "
+    },
+    "target": {
+      "main.txt": "SERVICE_NAME=billing-api\nPORT=9090\nurl = http://localhost:9090/health\nname = billing-api\ntimeout_seconds = 300"
+    }
+  },
+  {
+    "id": "6.3",
+    "instructions": "1. On the \"# BEGIN legacy\" line set mark a (ma), hop to the blank line after END (}), and delete back to the mark (d'a).\n2. Set mark w on the workers line (mw), go change production to staging, then jump back with 'w and change 4 to 8.",
+    "solution": ":5<CR>ma}d'amw:3<CR>wwcwstaging<Esc>'w$r8",
+    "start": {
+      "main.txt": "# app.conf\nname = shop\nmode = production\n\n# BEGIN legacy\nlegacy_auth = on\nlegacy_cache = on\nlegacy_port = 7000\n# END legacy\n\nworkers = 4\nlog = info"
+    },
+    "target": {
+      "main.txt": "# app.conf\nname = shop\nmode = staging\n\nworkers = 8\nlog = info"
+    }
+  },
+  {
+    "id": "6.4",
+    "instructions": "1. Jump to the last line (G) and change FAIL to OK.\n2. Jump to the top (gg) and change draft to final.\n3. Go back through the jump list with Ctrl-o to the status line and append \" (verified)\".\n4. Go back through the change list with g; to the title line and append \" v2\".",
+    "solution": "G$ciwOK<Esc>gg$ciwfinal<Esc><C-o>A (verified)<Esc>g;g;A v2<Esc>",
+    "start": {
+      "main.txt": "title: draft\nauthor: sam\n---\nstep 1: ok\nstep 2: ok\nstep 3: ok\nstep 4: ok\nstep 5: ok\nstep 6: ok\nstep 7: ok\nstep 8: ok\nstep 9: ok\n---\nstatus: FAIL"
+    },
+    "target": {
+      "main.txt": "title: final v2\nauthor: sam\n---\nstep 1: ok\nstep 2: ok\nstep 3: ok\nstep 4: ok\nstep 5: ok\nstep 6: ok\nstep 7: ok\nstep 8: ok\nstep 9: ok\n---\nstatus: OK (verified)"
+    }
+  },
+  {
+    "id": "6.5",
+    "instructions": "Review:\n1. Set mark a on line 3 (ma).\n2. Yank the three URLs into registers a, b and c (\"ayiW ...).\n3. Under \"## Links\", add a \"- \" line for each URL with Ctrl-r a/b/c.\n4. Jump back to the mark ('a) and change See to Visit.",
+    "solution": ":3<CR>maW\"ayiWj0WWW\"byiWj05W\"cyiWGo- <C-r>a<CR>- <C-r>b<CR>- <C-r>c<Esc>'acwVisit<Esc>",
+    "start": {
+      "main.txt": "# Reading list\n\nSee https://neovim.io for the editor.\nDocs live at https://vimhelp.org today.\nThe plugin manager is at https://github.com/folke/lazy.nvim now.\n\n## Links"
+    },
+    "target": {
+      "main.txt": "# Reading list\n\nVisit https://neovim.io for the editor.\nDocs live at https://vimhelp.org today.\nThe plugin manager is at https://github.com/folke/lazy.nvim now.\n\n## Links\n- https://neovim.io\n- https://vimhelp.org\n- https://github.com/folke/lazy.nvim"
+    }
+  }
+]

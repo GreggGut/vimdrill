@@ -1,0 +1,9 @@
+Version: 2.4.1
+Release PLACEHOLDER is out.
+TODO: write tests
+Notes about the release
+TODO: update changelog
+More notes here
+TODO: tag the release
+
+## Collected TODOs

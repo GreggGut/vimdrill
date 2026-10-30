@@ -1,0 +1,9 @@
+{
+  "id": "9.2",
+  "instructions": "Move clamp() from utils.js into main.js using windows:\n1. :vs utils.js and cut the function there with dap.\n2. In its place type: // moved to main.js\n3. Ctrl-w w to the main.js window, then ggP to paste it at the top.\n4. :sp README.md and add a last line: - clamp() now lives in main.js\n5. Ctrl-w c to close the README window, then :wa",
+  "solution": ":vs utils.js<CR>dapi// moved to main.js<Esc><C-w>wggP:sp README.md<CR>Go- clamp() now lives in main.js<Esc><C-w>c:wa<CR>",
+  "open": [
+    "main.js"
+  ],
+  "diff": false
+}
