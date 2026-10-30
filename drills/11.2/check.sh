@@ -14,9 +14,10 @@ finish() { if [ $fail -eq 0 ]; then echo "All checks passed."; exit 0; else echo
 echo "Checking LSP"
 if command -v tsc >/dev/null; then
   v=$(tsc --version 2>/dev/null | grep -o '[0-9][0-9.]*' | head -1)
-  [ "${v%%.*}" -ge 7 ] 2>/dev/null && ok "tsc $v (has --lsp)" || bad "tsc is $v; the built-in LSP needs 7+" "npm install -g typescript@latest (or use typescript-language-server, step 5)"
+  [ "${v%%.*}" -ge 7 ] 2>/dev/null && ok "tsc $v (has --lsp)" \
+    || printf '  - tsc %s has no --lsp: fine if typescript-language-server attaches instead (step 5)\n' "$v"
 else
-  bad "tsc not found" "npm install -g typescript"
+  printf '  - tsc not found: fine if another TypeScript server attaches (step 5)\n'
 fi
 t=$(mktemp -d); echo '{}' > "$t/package.json"; printf 'const n: number = 1;\nexport { n };\n' > "$t/a.ts"
 out=$(cd "$t" && nvim --headless a.ts -c 'lua vim.wait(20000, function() return #vim.lsp.get_clients({ bufnr = 0 }) > 0 end, 200); local c = vim.lsp.get_clients({ bufnr = 0 }); io.stdout:write("CLIENT=" .. (#c > 0 and c[1].name or "none"))' -c 'qa!' 2>&1)

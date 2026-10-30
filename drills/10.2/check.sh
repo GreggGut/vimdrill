@@ -16,6 +16,8 @@ echo "Checking mappings"
 w=$(q 'vim.fn.maparg("<leader>w", "n")'); echo "$w" | grep -qi 'w' && ok "<leader>w -> $w" || bad "no <leader>w mapping" "vim.keymap.set('n', '<leader>w', '<cmd>write<CR>')"
 x=$(q 'vim.fn.maparg("<leader>q", "n")'); [ -n "$x" ] && ok "<leader>q -> $x" || bad "no <leader>q mapping"
 e=$(q 'vim.fn.maparg("<Esc>", "n")'); echo "$e" | grep -qi 'noh' && ok "<Esc> clears search highlight" || bad "<Esc> doesn't run :nohlsearch" "vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')"
-n=$(q '#vim.tbl_filter(function(m) return m.lhs:sub(1,1) == " " end, vim.api.nvim_get_keymap("n"))')
-[ "${n:-0}" -ge 3 ] && ok "$n leader mappings" || bad "only ${n:-0} leader mapping(s)" "add your own in step 3 (a non-leader one is fine too, it just isn't counted here)"
+maps='table.concat(vim.iter({"n","x","s","o","i","c","t"}):map(function(md) return vim.iter(vim.api.nvim_get_keymap(md)):map(function(m) return md .. " " .. m.lhs .. " " .. (m.rhs or "<fn>") end):totable() end):flatten():totable(), "\n")'
+defaults=$(nvim --headless --clean -c "lua io.stdout:write(tostring($maps))" -c 'qa!' 2>/dev/null | sort -u)
+n=$(comm -23 <(q "$maps" | sort -u) <(printf '%s\n' "$defaults") | grep -cvE '^n ( w| q|<Esc>) ')
+[ "${n:-0}" -ge 1 ] && ok "$n mapping(s) of your own" || bad "no mapping of your own yet" "step 3: map a key Neovim doesn't already map"
 finish
