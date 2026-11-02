@@ -144,9 +144,11 @@ def migrate_old_layout(out):
     for name in ("log.jsonl", "tracker_url"):
         if (OLD_HOME / name).exists():
             shutil.copy2(OLD_HOME / name, STATE_DIR / name)
-    tmp = STATE.with_suffix(".tmp")  # state last, atomically: it marks the copy as done
+    # state last, atomically: it marks the copy as done. A unique tmp name, as several terminals may start at once
+    fd, tmp = tempfile.mkstemp(dir=STATE_DIR, suffix=".tmp")
+    os.close(fd)
     shutil.copy2(OLD_HOME / "state.json", tmp)
-    tmp.replace(STATE)
+    os.replace(tmp, STATE)
     print(f"{DIM}vimdrill: copied your progress from {OLD_HOME} to {STATE_DIR} (the old files are untouched){RST}",
           file=out)
 
@@ -657,7 +659,7 @@ def cmd_quiz_pool():
 
 def main(argv):
     # JSON commands keep stdout parseable; everywhere else (the shell nudge hides stderr) the note must show
-    migrate_old_layout(sys.stderr if argv[:1] in (["--state"], ["--quiz-pool"], ["--sync-files"]) else sys.stdout)
+    migrate_old_layout(sys.stderr if argv[:1] in (["--state"], ["--quiz-pool"], ["--sync-files"], ["--record-quiz"]) else sys.stdout)
     if not argv:
         state = load_state()
         if not STATE.exists():
