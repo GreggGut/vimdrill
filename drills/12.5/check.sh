@@ -11,8 +11,8 @@ startup_errors() { nvim --headless -c 'qa!' 2>&1 | grep -iE 'error|E[0-9]{3,4}:'
 finish() { if [ $fail -eq 0 ]; then echo "All checks passed."; exit 0; else echo "Not done yet - fix the ✘ items and run: vimdrill --check"; exit 1; fi; }
 # ---
 
-F=~/vim-mastery/my-cheatsheet.md
-if [ ! -f "$F" ]; then bad "no $F yet" "nvim $F"; finish; fi
+F=${VIMDRILL_WORK:-$HOME/vimdrill}/cheatsheet.md
+if [ ! -f "$F" ]; then bad "no $F yet" "nvim $F, then :w ++p"; finish; fi
 n=$(grep -c '[^[:space:]]' "$F")
 [ "$n" -ge 40 ] && ok "$n non-empty lines" || bad "only $n non-empty lines (need 40)" "keep writing"
 s=$(grep -c '^#' "$F"); [ "$s" -ge 3 ] && ok "$s section headings" || bad "fewer than 3 headings (# ...)" "group it into sections"
