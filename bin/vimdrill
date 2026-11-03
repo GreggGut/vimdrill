@@ -1,23 +1,38 @@
 #!/usr/bin/env python3
-"""vimdrill - daily vim drills, streak and lesson gate.
+"""vimdrill - learn Vim in Neovim: 60 lessons, drills scored by keystrokes against par.
+
+Two modes (vimdrill --mode):
+  self-paced  the default: every lesson is open, and you test yourself with vimdrill --quiz
+  coached     the /vim-daily skill in Claude Code quizzes you each day: the next lesson unlocks
+              at 80%, and a missed weekday resets the streak
+
+  vimdrill                 run the lesson you're on (self-paced: the first drill you haven't
+                           passed; coached: today's drill)
+  vimdrill <id>            practice any lesson (coached: unlocked ones); doesn't count
+  vimdrill --review        practice a random drill you've passed (doesn't count)
+  vimdrill --mix [SEED] [--all]
+                           4 freshly generated rounds from the lessons you've done (doesn't count);
+                           --all mixes every lesson (self-paced)
+  vimdrill --check [id]    check a 'task' drill (config lessons)
+  vimdrill --show [id]     print the lesson card (concepts + tip)
+  vimdrill --quiz [id]     self-paced: quiz yourself and mark your own answers (never gates)
+  vimdrill --status        one-line status (used by the shell nudge)
+  vimdrill --mode [self-paced|coached]
+                           show or switch the mode
+  vimdrill --arrows [on|off]
+                           you move with the arrow keys: /vim-daily writes its examples with them
+
+Used by /vim-daily (coached):
+  vimdrill --state         machine-readable summary
+  vimdrill --quiz-pool     questions for today's quiz (current lesson + review)
+  vimdrill --record-quiz SCORE [--missed id,id] [--asked id,id]
+                           record today's quiz; advances the lesson if the gate passes
+  vimdrill --sync-files DIR
+                           optional: write summary.json + lessons.json for a tracker page
 
 Progress is kept in $XDG_STATE_HOME/vimdrill (default ~/.local/state/vimdrill;
 $VIMDRILL_HOME overrides it). Files you create in lessons go in ~/vimdrill
 ($VIMDRILL_WORK overrides it).
-
-  vimdrill                 run today's drill (current lesson)
-  vimdrill <id>            practice a specific unlocked drill (doesn't count)
-  vimdrill --review        practice a random completed drill (doesn't count)
-  vimdrill --mix [SEED]    4 freshly generated rounds from every unlocked lesson (doesn't count)
-  vimdrill --check         check a 'task' drill (config lessons)
-  vimdrill --show [id]     print the lesson card (concepts + tip)
-  vimdrill --status        one-line status (used by the shell nudge)
-  vimdrill --state         machine-readable summary for /vim-daily
-  vimdrill --record-quiz SCORE [--missed id,id] [--asked id,id]
-                           record today's quiz; advances lesson if gate passes
-  vimdrill --quiz-pool      questions for today's quiz (current lesson + review)
-  vimdrill --sync-files DIR
-                           write summary.json + lessons.json for the tracker page
 """
 import datetime as dt
 import json
@@ -44,6 +59,8 @@ WORK = Path(os.environ.get("VIMDRILL_WORK") or Path.home() / "vimdrill")
 OLD_HOME = Path.home() / "vim-mastery"  # where everything lived before the public repo
 
 PASS_SCORE = 0.8
+MODES = ("self-paced", "coached")
+QUIZ_CURRENT, QUIZ_REVIEW = 5, 5  # 10 questions: two misses still pass the 80% gate
 REPEAT_PAR_FACTOR = 1.5
 QUIT_KEYS = 5  # ":wqa<CR>" is included in par
 
@@ -83,13 +100,47 @@ def load_state():
     lessons = load_curriculum()
     return {
         "start_date": today(),
+        "mode": "self-paced",
         "current_lesson": lessons[0]["id"],
         "completed": [],
+        "passed": [],
         "attempts": {},
         "days": {},
         "misses": {},
         "best": {},
     }
+
+
+def mode(state):
+    # a state file from before modes existed that has progress is the original coached setup
+    return state.get("mode") or ("coached" if state["completed"] or state["days"] else "self-paced")
+
+
+def passed_drills(state):
+    """Lessons whose drill you've passed, in any mode (completed lessons and best scores count too)."""
+    return set(state.get("passed", [])) | set(state["completed"]) | set(state["best"])
+
+
+def first_unpassed(state, lessons):
+    done = passed_drills(state)
+    return next((l["id"] for l in lessons if l["id"] not in done), None)
+
+
+def mark_passed(state, lid, latest=True):
+    """Remember a passed drill. Self-paced moves on to the first lesson whose drill isn't passed yet.
+    latest: this is the lesson you're working on (--quiz asks about it), not a --review replay."""
+    if lid not in state.setdefault("passed", []):
+        state["passed"].append(lid)
+    if latest:
+        state["last_passed"] = {"lesson": lid, "date": today()}
+    if mode(state) == "self-paced":
+        state["current_lesson"] = first_unpassed(state, load_curriculum()) or state["current_lesson"]
+
+
+def quiz_hint(state):
+    if mode(state) == "coached":
+        return f"run {BOLD}/vim-daily{RST} in Claude Code for the quiz (unlocks the next lesson)"
+    return f"test yourself with {BOLD}vimdrill --quiz{RST}"
 
 
 def save_state(state):
@@ -347,7 +398,7 @@ def play(drill, src, title, prefix):
     return keys, secs, bad, work, route, used
 
 
-def run_edit_drill(lid, counts):
+def run_edit_drill(lid, counts, review=False):
     drill = load_drill(lid)
     lesson = lesson_by_id(load_curriculum(), lid)
     p = par(drill)
@@ -377,6 +428,8 @@ def run_edit_drill(lid, counts):
     best = state["best"].get(lid)
     if passed and (best is None or keys < best):
         state["best"][lid] = keys
+    if passed:
+        mark_passed(state, lid, latest=not review)
     if counts:
         rec = day_record(state)
         rec["lesson"] = lid
@@ -388,8 +441,8 @@ def run_edit_drill(lid, counts):
     save_state(state)
     if passed:
         shutil.rmtree(work)
-    if counts and passed:
-        print(f"\nNext: run {BOLD}/vim-daily{RST} in Claude Code for the quiz (unlocks the next lesson).")
+    if passed and (counts or mode(state) == "self-paced" and not review):
+        print(f"\nNext: {quiz_hint(state)}.")
     return passed
 
 
@@ -398,7 +451,8 @@ def run_task_drill(lid, check_only):
     if not check_only:
         print(f"{BOLD}Lesson {lid} task{RST}\n")
         print(drill["instructions"].rstrip())
-        print(f"\nWhen done, run: {BOLD}vimdrill --check{RST}")
+        arg = "" if lid == load_state()["current_lesson"] else f" {lid}"
+        print(f"\nWhen done, run: {BOLD}vimdrill --check{arg}{RST}")
         return None
     res = subprocess.run(["bash", str(drill_dir(lid) / "check.sh")], capture_output=True, text=True,
                          env={**os.environ, "VIMDRILL_WORK": str(WORK)})
@@ -406,11 +460,14 @@ def run_task_drill(lid, check_only):
     print((res.stdout + res.stderr).strip())
     print(f"{GRN}{BOLD}PASS{RST}" if passed else f"{RED}{BOLD}NOT YET{RST}")
     state = load_state()
-    rec = day_record(state)
-    rec["lesson"] = lid
+    if mode(state) == "coached" and lid == state["current_lesson"]:
+        rec = day_record(state)
+        rec["lesson"] = lid
+        if passed:
+            rec["drill_passed"] = True
     if passed:
-        rec["drill_passed"] = True
-        print(f"\nNext: run {BOLD}/vim-daily{RST} in Claude Code for the quiz.")
+        mark_passed(state, lid)
+        print(f"\nNext: {quiz_hint(state)}.")
     save_state(state)
     log({"event": "task", "lesson": lid, "passed": passed})
     return passed
@@ -426,21 +483,29 @@ def write_spec(spec, d):
     return {"open": ["main.txt"], **{k: v for k, v in spec.items() if k not in ("start", "target")}}
 
 
-def cmd_mix(seed=None):
-    """Practice rounds generated fresh from every unlocked lesson. Never touches the streak or the gate."""
+def cmd_mix(seed=None, every_lesson=False):
+    """Practice rounds generated fresh from the lessons you've done. Never touches the streak or the gate."""
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import mixgen
     state = load_state()
     lessons = load_curriculum()
-    unlocked = [lid for lid in state["completed"] + [state["current_lesson"]]
-                if lid in mixgen.GENERATORS or load_drill(lid).get("type", "edit") == "edit"]
+    if every_lesson and mode(state) == "coached":
+        sys.exit("coached mode only mixes lessons you've unlocked; --all is for self-paced (vimdrill --mode)")
+    if every_lesson:
+        pool = [l["id"] for l in lessons]
+    elif mode(state) == "self-paced":
+        done = passed_drills(state)
+        pool = [l["id"] for l in lessons if l["id"] in done or l["id"] == state["current_lesson"]]
+    else:
+        pool = state["completed"] + [state["current_lesson"]]
+    unlocked = [lid for lid in pool if lid in mixgen.GENERATORS or load_drill(lid).get("type", "edit") == "edit"]
     if not unlocked:
         sys.exit("nothing to mix yet - run vimdrill")
     seed = random.randrange(100000) if seed is None else seed
     rng = random.Random(seed)
     current = state["current_lesson"] if state["current_lesson"] in unlocked else unlocked[-1]
     rounds = mixgen.pick_rounds(rng, unlocked, current, state["misses"])
-    print(f"{BOLD}Mix #{seed}{RST}: lessons {', '.join(rounds)}  {DIM}(practice only; replay with vimdrill --mix {seed}){RST}")
+    print(f"{BOLD}Mix #{seed}{RST}: lessons {', '.join(rounds)}  {DIM}(practice only; replay with vimdrill --mix {seed}{" --all" if every_lesson else ""}){RST}")
     base = Path(tempfile.mkdtemp(prefix="vimmix-"))
     results = []
     for n, lid in enumerate(rounds, 1):
@@ -506,6 +571,17 @@ def cmd_status():
         return
     state = load_state()
     lessons = load_curriculum()
+    if mode(state) == "self-paced":
+        nxt = lesson_by_id(lessons, first_unpassed(state, lessons))
+        last = state.get("last_passed") or {}
+        if nxt is None:
+            print(f"{GRN}Vim:{RST} every lesson practiced · keep it up with vimdrill --mix --all")
+        elif last.get("date") == today():
+            print(f'{GRN}Vim ✔{RST} practiced {last["lesson"]} today · test yourself: vimdrill --quiz'
+                  f' · next: {nxt["id"]} "{nxt["title"]}"')
+        else:
+            print(f'{YEL}Vim:{RST} next: {nxt["id"]} "{nxt["title"]}" · run {BOLD}vimdrill{RST}')
+        return
     lid = state["current_lesson"]
     lesson = lesson_by_id(lessons, lid)
     rec = state["days"].get(today(), {})
@@ -544,6 +620,8 @@ def cmd_state():
     lid = state["current_lesson"]
     out = {
         "today": today(),
+        "mode": mode(state),
+        "arrows": bool(state.get("arrows")),
         "weekend": is_weekend(today()),
         "streak": streak(state),
         "current_lesson": lesson_by_id(lessons, lid),
@@ -557,17 +635,8 @@ def cmd_state():
     print(json.dumps(out, indent=2))
 
 
-def cmd_record_quiz(score, missed, asked):
-    state = load_state()
-    lessons = load_curriculum()
-    rec = day_record(state)
-    lid = state["current_lesson"]
-    if not rec.get("drill_passed"):
-        sys.exit("refused: today's drill hasn't passed yet - run vimdrill first")
-    if rec.get("quiz_taken"):
-        sys.exit("refused: quiz already recorded today")
-    rec["quiz_taken"] = True
-    rec["quiz_score"] = round(score, 3)
+def update_misses(state, asked, missed):
+    """A missed question comes back in later quizzes until it's answered right twice in a row."""
     for qid in asked:
         if qid in state["misses"] and qid not in missed:
             m = state["misses"][qid]
@@ -579,6 +648,23 @@ def cmd_record_quiz(score, missed, asked):
         m["count"] += 1
         m["last"] = today()
         m["streak_right"] = 0
+
+
+def cmd_record_quiz(score, missed, asked):
+    state = load_state()
+    lessons = load_curriculum()
+    if mode(state) != "coached":
+        sys.exit("refused: self-paced mode has no graded quiz - test yourself with vimdrill --quiz,"
+                 " or switch with vimdrill --mode coached")
+    rec = day_record(state)
+    lid = state["current_lesson"]
+    if not rec.get("drill_passed"):
+        sys.exit("refused: today's drill hasn't passed yet - run vimdrill first")
+    if rec.get("quiz_taken"):
+        sys.exit("refused: quiz already recorded today")
+    rec["quiz_taken"] = True
+    rec["quiz_score"] = round(score, 3)
+    update_misses(state, asked, missed)
     state["attempts"][lid] = state["attempts"].get(lid, 0) + 1
     advanced = None
     if score >= PASS_SCORE:
@@ -642,19 +728,106 @@ def cmd_sync_files(out_dir):
                       "tracker_url": TRACKER_URL.read_text().strip() if TRACKER_URL.exists() else None}))
 
 
+def quiz_pool(state, lessons, lid, done_ids):
+    """The lesson's questions plus review: past misses first, then random questions from lessons done."""
+    by_id = {q["id"]: q for l in lessons for q in l["quiz"]}
+    cur = lesson_by_id(lessons, lid)
+    current = random.sample(cur["quiz"], min(QUIZ_CURRENT, len(cur["quiz"])))
+    misses = sorted(state["misses"].items(), key=lambda kv: (-kv[1]["count"], kv[1].get("last", "")))
+    review = [by_id[qid] for qid, _ in misses if qid in by_id and by_id[qid] not in current][:QUIZ_REVIEW - 1]
+    done = [lesson_by_id(lessons, d) for d in done_ids]
+    pool = [q for l in done if l for q in l["quiz"] if q not in review and q not in current]
+    random.shuffle(pool)
+    review += pool[:max(1, QUIZ_REVIEW - len(review))]
+    return {"lesson": {"id": cur["id"], "title": cur["title"]}, "current": current, "review": review[:QUIZ_REVIEW]}
+
+
 def cmd_quiz_pool():
     state = load_state()
+    print(json.dumps(quiz_pool(state, load_curriculum(), state["current_lesson"], state["completed"]), indent=1))
+
+
+def cmd_quiz(lid=None):
+    """Self-check in the terminal: you answer, see the reference answer and mark yourself. Never gates."""
+    state = load_state()
     lessons = load_curriculum()
-    by_id = {q["id"]: q for l in lessons for q in l["quiz"]}
-    cur = lesson_by_id(lessons, state["current_lesson"])
-    misses = sorted(state["misses"].items(), key=lambda kv: (-kv[1]["count"], kv[1].get("last", "")))
-    review = [by_id[qid] for qid, _ in misses if qid in by_id][:3]
-    done = [lesson_by_id(lessons, lid) for lid in state["completed"]]
-    pool = [q for l in done if l for q in l["quiz"] if q not in review]
-    random.shuffle(pool)
-    review += pool[:max(1, 4 - len(review))]
-    print(json.dumps({"lesson": {"id": cur["id"], "title": cur["title"]},
-                      "current": random.sample(cur["quiz"], 4), "review": review[:4]}, indent=1))
+    if mode(state) == "coached":
+        sys.exit("coached mode: your quiz is /vim-daily in Claude Code (or switch with vimdrill --mode self-paced)")
+    lid = lid or (state.get("last_passed") or {}).get("lesson") or state["current_lesson"]
+    if not lesson_by_id(lessons, lid):
+        sys.exit("no such lesson")
+    pool = quiz_pool(state, lessons, lid, [l["id"] for l in lessons if l["id"] in passed_drills(state)])
+    questions = pool["current"] + pool["review"]
+    random.shuffle(questions)
+    print(f"{BOLD}Self-check: lesson {lid} {pool['lesson']['title']}{RST}  "
+          f"{DIM}({len(questions)} questions; answer, then mark yourself. Ctrl-D stops.){RST}")
+    asked, missed = [], []
+    try:
+        for n, q in enumerate(questions, 1):
+            print(f"\n{BOLD}{n}/{len(questions)}{RST} {q['q']}")
+            input("  your answer: ")
+            print(f"  {GRN}answer:{RST} {q['a']}")
+            right = ""
+            while right not in ("y", "n"):
+                right = input("  were you right? [y/n] ").strip().lower()[:1]
+            asked.append(q["id"])
+            if right == "n":
+                missed.append(q)
+    except (EOFError, KeyboardInterrupt):
+        print()
+    if not asked:
+        return
+    score = (len(asked) - len(missed)) / len(asked)
+    update_misses(state, asked, [q["id"] for q in missed])
+    save_state(state)
+    log({"event": "selfquiz", "lesson": lid, "score": round(score, 3), "missed": [q["id"] for q in missed]})
+    print(f"\n{BOLD}{len(asked) - len(missed)}/{len(asked)} right ({score:.0%}){RST}")
+    if missed:
+        print(f"{DIM}These come back in later quizzes until you get them right twice:{RST}")
+        for q in missed:
+            print(f"  {q['q']}  {GRN}{q['a']}{RST}")
+
+
+def cmd_mode(new=None):
+    state = load_state()
+    lessons = load_curriculum()
+    if new is None:
+        print(mode(state))
+        return
+    if new not in MODES:
+        sys.exit("usage: vimdrill --mode [self-paced|coached]")
+    if new == "coached" and mode(state) != "coached":
+        # lessons whose drill you passed count as done; coached starts at the first one you haven't
+        done = passed_drills(state)
+        state["completed"] = [l["id"] for l in lessons if l["id"] in done]
+    if new != mode(state):
+        state["current_lesson"] = first_unpassed(state, lessons) or lessons[-1]["id"]
+    state["mode"] = new
+    save_state(state)
+    lesson = lesson_by_id(lessons, state["current_lesson"])
+    if new == "coached":
+        print(f"Coached mode: today's lesson is {lesson['id']} \"{lesson['title']}\". Pass the drill with vimdrill,"
+              f" then run /vim-daily in Claude Code for the quiz (80% unlocks the next lesson).")
+    else:
+        print(f"Self-paced mode: every lesson is open. You're on {lesson['id']} \"{lesson['title']}\";"
+              f" test yourself with vimdrill --quiz.")
+
+
+def cmd_arrows(value=None):
+    state = load_state()
+    if value is not None:
+        if value not in ("on", "off"):
+            sys.exit("usage: vimdrill --arrows [on|off]")
+        state["arrows"] = value == "on"
+        save_state(state)
+    print("arrows " + ("on" if state.get("arrows") else "off"))
+
+
+def run_lesson(lid, counts):
+    if load_drill(lid).get("type") == "task":
+        run_task_drill(lid, check_only=False)
+    else:
+        run_edit_drill(lid, counts=counts)
 
 
 def main(argv):
@@ -664,38 +837,56 @@ def main(argv):
         state = load_state()
         if not STATE.exists():
             save_state(state)
+        if mode(state) == "self-paced":
+            lid = first_unpassed(state, load_curriculum())
+            if lid is None:
+                print("You've passed every drill. Keep practicing: vimdrill --mix --all, or vimdrill <id>.")
+                return
+            run_lesson(lid, counts=False)
+            return
         lid = state["current_lesson"]
-        drill = load_drill(lid)
-        if drill.get("type") == "task":
-            run_task_drill(lid, check_only=False)
+        if load_drill(lid).get("type") != "task" and state["days"].get(today(), {}).get("drill_passed"):
+            print(f"{DIM}Already passed today - this run is practice.{RST}")
+            run_lesson(lid, counts=False)
         else:
-            if state["days"].get(today(), {}).get("drill_passed"):
-                print(f"{DIM}Already passed today - this run is practice.{RST}")
-                run_edit_drill(lid, counts=False)
-            else:
-                run_edit_drill(lid, counts=True)
+            run_lesson(lid, counts=True)
         return
     a = argv[0]
+    arg = argv[1] if len(argv) > 1 else None
     if a in ("-h", "--help"):
         print(__doc__)
     elif a == "--status":
         cmd_status()
     elif a == "--show":
-        cmd_show(argv[1] if len(argv) > 1 else None)
+        cmd_show(arg)
     elif a == "--state":
         cmd_state()
     elif a == "--check":
-        run_task_drill(load_state()["current_lesson"], check_only=True)
+        state = load_state()
+        lid = arg or state["current_lesson"]
+        if mode(state) == "coached" and lid not in state["completed"] + [state["current_lesson"]]:
+            sys.exit(f"lesson {lid} isn't unlocked yet")
+        if not lesson_by_id(load_curriculum(), lid) or load_drill(lid).get("type") != "task":
+            sys.exit(f"lesson {lid} has no task to check - run vimdrill {lid}")
+        run_task_drill(lid, check_only=True)
     elif a == "--review":
         state = load_state()
-        done = [l for l in state["completed"] if load_drill(l).get("type", "edit") == "edit"]
+        done = state["completed"] if mode(state) == "coached" else sorted(passed_drills(state))
+        done = [l for l in done if load_drill(l).get("type", "edit") == "edit"]
         if not done:
-            sys.exit("nothing completed yet - run vimdrill")
-        run_edit_drill(random.choice(done), counts=False)
+            sys.exit("nothing done yet - run vimdrill")
+        run_edit_drill(random.choice(done), counts=False, review=True)
     elif a == "--mix":
-        cmd_mix(int(argv[1]) if len(argv) > 1 else None)
+        nums = [x for x in argv[1:] if x != "--all"]
+        cmd_mix(int(nums[0]) if nums else None, every_lesson="--all" in argv[1:])
+    elif a == "--quiz":
+        cmd_quiz(arg)
     elif a == "--quiz-pool":
         cmd_quiz_pool()
+    elif a == "--mode":
+        cmd_mode(arg)
+    elif a == "--arrows":
+        cmd_arrows(arg)
     elif a == "--sync-files":
         cmd_sync_files(argv[1])
     elif a == "--record-quiz":
@@ -703,11 +894,15 @@ def main(argv):
         opts = dict(zip(argv[2::2], argv[3::2]))
         split = lambda s: [x for x in (s or "").split(",") if x]
         cmd_record_quiz(score, split(opts.get("--missed")), split(opts.get("--asked")))
+    elif a.startswith("-"):
+        sys.exit(f"unknown option {a} - see vimdrill --help")
     else:
         state = load_state()
-        if a not in state["completed"] + [state["current_lesson"]]:
+        if not lesson_by_id(load_curriculum(), a):
+            sys.exit(f"no lesson {a}")
+        if mode(state) == "coached" and a not in state["completed"] + [state["current_lesson"]]:
             sys.exit(f"lesson {a} isn't unlocked yet")
-        run_edit_drill(a, counts=False)
+        run_lesson(a, counts=False)
 
 
 if __name__ == "__main__":
