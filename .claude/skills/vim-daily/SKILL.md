@@ -22,14 +22,14 @@ Run `vimdrill --state` and read it.
 - `mode` is `self-paced`: run `vimdrill --mode coached` and tell the user in one line that /vim-daily
   is the coached course (daily graded quiz, 80% gate, streak); lessons whose drill they passed count
   as done, and `vimdrill --mode self-paced` switches back. Then run `vimdrill --state` again.
-- `today_record.drill_passed` is false: tell them today's lesson (id + title), show the card from
+- `today_record.drill_passed` isn't true: tell them today's lesson (id + title), show the card from
   `vimdrill --show`, and tell them to run `vimdrill` in a terminal and come back. Stop. Do not quiz.
   (On weekends, say the drill is optional and offer the quiz only if they did the drill.)
 - `today_record.quiz_taken` is true: they're done for today. Report streak and tomorrow's lesson, offer
-  `vimdrill --mix` for extra practice (fresh random rounds from every unlocked lesson; never counts),
+  `vimdrill --mix` for extra practice (rounds mixed from the unlocked lessons; never counts),
   then go to step 4 (sync) and stop.
-- Otherwise open with one line: streak, lesson, keystrokes vs par from `today_record`. If keys > 2x par,
-  give one concrete hint for doing that drill in fewer keys.
+- Otherwise open with one line: streak, lesson, and keystrokes vs par from `today_record` if it has
+  them (task lessons don't). If keys > 2x par, give one concrete hint for doing that drill in fewer keys.
 
 ## 2. Quiz
 
@@ -58,12 +58,12 @@ if the drill hasn't passed or the quiz was already recorded; report the refusal 
 
 - Passed: congratulate briefly, then show the next lesson card with `vimdrill --show` (tomorrow's
   lesson; they may start it today if they want).
-- Failed: say they'll repeat the lesson tomorrow, that the repeat drill must come in at or under 1.5x
-  par, and name the 1-2 concepts to revise. Suggest `vimdrill --mix` to practice them before tomorrow.
+- Failed: say they'll repeat the lesson tomorrow (for an edit drill, the repeat must come in at or
+  under 1.5x par), and name the 1-2 concepts to revise. Suggest `vimdrill --mix` to practice them before tomorrow.
 
 ## 4. Sync the tracker page (only if one is set up)
 
-1. `vimdrill --sync-files <your scratchpad dir>/vim-sync` prints the two file paths and `tracker_url`.
+1. `vimdrill --sync-files <a temporary directory>/vim-sync` prints the two file paths and `tracker_url`.
    If `tracker_url` is null, skip the rest of this step without mentioning it.
 2. `ArtifactData` `list` with `collection: "progress"` on `tracker_url` to read the current `version`
    of the `summary` and `lessons` docs.

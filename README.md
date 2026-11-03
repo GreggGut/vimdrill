@@ -2,7 +2,7 @@
 
 A 12-week course that teaches Vim in Neovim, one short lesson a day. Each of the 60 lessons has a
 lesson card, a hands-on drill scored by keystrokes against par, and quiz questions. `vimdrill --mix`
-generates fresh practice rounds from the lessons you've done.
+mixes practice rounds from the lessons you've done.
 
 | Week | Topic | Week | Topic |
 |---|---|---|---|
@@ -34,8 +34,8 @@ Optional, for zsh: a one-line status in every new terminal, so you don't forget 
 echo 'source ~/vimdrill-course/nudge.zsh' >> ~/.zshrc
 ```
 
-Weeks 10 and 11 set up your own Neovim config. They also need git, ripgrep, a C compiler (e.g. gcc,
-for treesitter parsers) and Node.js with npm (for the TypeScript language server).
+Weeks 10 and 11 set up your own Neovim config. They also need git, ripgrep and Node.js with npm (for
+the TypeScript language server).
 
 ## Learn on your own (self-paced)
 
@@ -51,19 +51,20 @@ vimdrill --quiz        # test yourself on it: answer, see the answer, mark yours
 |---|---|
 | `vimdrill <id>` | Run any lesson's drill, e.g. `vimdrill 4.2` |
 | `vimdrill --show [id]` | Print a lesson card |
-| `vimdrill --quiz [id]` | Self-check quiz: 5 questions on the lesson plus up to 5 review questions. Questions you miss come back in later quizzes until you get them right twice. Nothing is gated. |
-| `vimdrill --mix` | 4 freshly generated rounds from the lessons you've passed and the one you're on |
+| `vimdrill --quiz [id]` | Self-check quiz: 5 questions on the lesson plus up to 5 review questions. Questions you miss come back in later quizzes until you get them right twice in a row. Nothing is gated. |
+| `vimdrill --mix` | 4 practice rounds from the lessons you've passed and the one you're on |
 | `vimdrill --mix --all` | The same, from every lesson |
 | `vimdrill --review` | Replay a random drill you've passed |
-| `vimdrill --check [id]` | Check a setup task (the config lessons in weeks 10 and 11) |
+| `vimdrill --check [id]` | Check a task lesson (your config in weeks 10 and 11, the cheat sheet in 12.5) |
 | `vimdrill --status` | One-line status |
 
 ## Coached, with Claude Code
 
-The `/vim-daily` skill turns the course into a daily routine with a coach:
+The `/vim-daily` skill turns the course into a daily routine with a coach. Start by running
+`/vim-daily` once (or `vimdrill --mode coached`): that switches you to coached mode. Then, every day:
 
 1. Run `vimdrill` to pass today's drill.
-2. Run `/vim-daily` in Claude Code. It quizzes you on today's lesson plus review questions (10 in all),
+2. Run `/vim-daily` in Claude Code. It quizzes you on today's lesson plus review questions (up to 10),
    one at a time, and grades your answers.
 3. 80% (8 of 10) unlocks the next lesson. Below that, you repeat the lesson the next day, and the repeat
    drill must come in at or under 1.5 times par.
@@ -75,11 +76,11 @@ The skill is in `.claude/skills/vim-daily` and loads automatically when you star
 the clone. To use `/vim-daily` from anywhere:
 
 ```sh
-ln -s ~/vimdrill-course/.claude/skills/vim-daily ~/.claude/skills/vim-daily
+mkdir -p ~/.claude/skills && ln -s ~/vimdrill-course/.claude/skills/vim-daily ~/.claude/skills/vim-daily
 ```
 
-The first `/vim-daily` switches you to coached mode. Lessons whose drill you've passed count as done,
-and you start at the first one you haven't. `vimdrill --mode self-paced` switches back, keeping all
+When you switch to coached mode, lessons whose drill you passed self-paced count as done, and you start
+at the first one you haven't. `vimdrill --mode self-paced` switches back, keeping all
 your progress. If you move with the arrow keys instead of hjkl, run `vimdrill --arrows on`, and the
 coach writes its examples with arrows. Arrows are always accepted as answers either way.
 
@@ -93,11 +94,13 @@ Every key you press counts, including the `:wqa<CR>`. **Par** is the keystroke c
 solution. You pass when the file matches; at or under par is the goal. More than twice par means
 there's a shorter way: re-read the lesson card.
 
-Most `--mix` rounds are generated, so each one is new. When you're over par on one, it shows the par
-route next to yours. Some rounds ask for a specific key, such as `gi`, and only pass if you used it.
+`--mix` puts 4 rounds together, with your current lesson and the lessons you've missed quiz questions
+on coming up more often. Week 1 rounds are generated fresh every time; when you're over par on one, it
+shows the par route next to yours. Some rounds ask for a specific key, such as `gi`, and only pass if
+you used it. Rounds from later lessons replay that lesson's drill.
 
-The setup lessons in weeks 10 and 11 are tasks rather than edits: you change your own Neovim config,
-then `vimdrill --check` tests the result.
+The lessons in weeks 10 and 11, and the cheat sheet in 12.5, are tasks rather than edits: you change
+your own Neovim config or write a file, then `vimdrill --check` tests the result.
 
 ## Your files
 

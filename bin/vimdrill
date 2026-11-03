@@ -11,7 +11,7 @@ Two modes (vimdrill --mode):
   vimdrill <id>            run any lesson's drill (coached: unlocked ones, as practice)
   vimdrill --review        practice a random drill you've passed (doesn't count)
   vimdrill --mix [SEED] [--all]
-                           4 freshly generated rounds from the lessons you've done (doesn't count);
+                           4 practice rounds from the lessons you've done (doesn't count);
                            --all mixes every lesson (self-paced)
   vimdrill --check [id]    check a 'task' drill (config lessons)
   vimdrill --show [id]     print the lesson card (concepts + tip)
@@ -833,7 +833,8 @@ def run_lesson(lid, counts):
 
 def main(argv):
     # JSON commands keep stdout parseable; everywhere else (the shell nudge hides stderr) the note must show
-    migrate_old_layout(sys.stderr if argv[:1] in (["--state"], ["--quiz-pool"], ["--sync-files"], ["--record-quiz"]) else sys.stdout)
+    if argv[:1] not in (["-h"], ["--help"]):
+        migrate_old_layout(sys.stderr if argv[:1] in (["--state"], ["--quiz-pool"], ["--sync-files"], ["--record-quiz"]) else sys.stdout)
     if not argv:
         state = load_state()
         if not STATE.exists():
