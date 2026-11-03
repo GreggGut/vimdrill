@@ -55,7 +55,7 @@ vimdrill --quiz        # test yourself on it: answer, see the answer, mark yours
 | `vimdrill --mix` | 4 practice rounds from the lessons you've passed and the one you're on |
 | `vimdrill --mix --all` | The same, from every lesson |
 | `vimdrill --review` | Replay a random drill you've passed |
-| `vimdrill --check [id]` | Check a task lesson (your config in weeks 10 and 11, the cheat sheet in 12.5) |
+| `vimdrill --check [id]` | Check a task lesson (your config in weeks 10 and 11, your cheat sheet in 12.5) |
 | `vimdrill --status` | One-line status |
 
 ## Coached, with Claude Code
@@ -66,8 +66,8 @@ The `/vim-daily` skill turns the course into a daily routine with a coach. Start
 1. Run `vimdrill` to pass today's drill.
 2. Run `/vim-daily` in Claude Code. It quizzes you on today's lesson plus review questions (up to 10),
    one at a time, and grades your answers.
-3. 80% (8 of 10) unlocks the next lesson. Below that, you repeat the lesson the next day, and the repeat
-   drill must come in at or under 1.5 times par.
+3. 80% (8 of 10) unlocks the next lesson. Below that, you repeat the lesson the next day; for an edit
+   drill, the repeat must come in at or under 1.5 times par.
 
 Your streak counts weekdays with both a drill and a quiz. Weekends never break it; a missed weekday
 resets it. Lessons unlock one at a time, so `vimdrill <id>` and `--mix` only use what you've unlocked.
@@ -99,7 +99,7 @@ on coming up more often. Week 1 rounds are generated fresh every time; when you'
 shows the par route next to yours. Some rounds ask for a specific key, such as `gi`, and only pass if
 you used it. Rounds from later lessons replay that lesson's drill.
 
-The lessons in weeks 10 and 11, and the cheat sheet in 12.5, are tasks rather than edits: you change
+The setup lessons in weeks 10 and 11, and the cheat sheet in 12.5, are tasks rather than edits: you change
 your own Neovim config or write a file, then `vimdrill --check` tests the result.
 
 ## Your files

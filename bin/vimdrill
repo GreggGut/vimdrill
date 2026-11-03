@@ -13,7 +13,7 @@ Two modes (vimdrill --mode):
   vimdrill --mix [SEED] [--all]
                            4 practice rounds from the lessons you've done (doesn't count);
                            --all mixes every lesson (self-paced)
-  vimdrill --check [id]    check a 'task' drill (config lessons)
+  vimdrill --check [id]    check a task lesson (setup in weeks 10-11, the cheat sheet in 12.5)
   vimdrill --show [id]     print the lesson card (concepts + tip)
   vimdrill --quiz [id]     self-paced: quiz yourself and mark your own answers (never gates)
   vimdrill --status        one-line status (used by the shell nudge)
@@ -782,7 +782,7 @@ def cmd_quiz(lid=None):
     log({"event": "selfquiz", "lesson": lid, "score": round(score, 3), "missed": [q["id"] for q in missed]})
     print(f"\n{BOLD}{len(asked) - len(missed)}/{len(asked)} right ({score:.0%}){RST}")
     if missed:
-        print(f"{DIM}These come back in later quizzes until you get them right twice:{RST}")
+        print(f"{DIM}These come back in later quizzes until you get them right twice in a row:{RST}")
         for q in missed:
             print(f"  {q['q']}  {GRN}{q['a']}{RST}")
 
@@ -800,6 +800,7 @@ def cmd_mode(new=None):
         done = passed_drills(state)
         state["completed"] = [l["id"] for l in lessons if l["id"] in done]
     if new != mode(state):
+        state.pop("last_passed", None)  # --quiz then asks about the lesson you're on
         state["current_lesson"] = first_unpassed(state, lessons) or lessons[-1]["id"]
     state["mode"] = new
     save_state(state)
@@ -882,7 +883,7 @@ def main(argv):
         run_edit_drill(random.choice(done), counts=False, review=True)
     elif a == "--mix":
         nums = [x for x in argv[1:] if x != "--all"]
-        if len(nums) > 1 or nums and not nums[0].isdigit():
+        if len(nums) > 1 or nums and not nums[0].isdecimal():
             sys.exit("usage: vimdrill --mix [SEED] [--all]")
         cmd_mix(int(nums[0]) if nums else None, every_lesson="--all" in argv[1:])
     elif a == "--quiz":
