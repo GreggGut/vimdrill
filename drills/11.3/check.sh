@@ -11,7 +11,7 @@ startup_errors() { nvim --headless -c 'qa!' 2>&1 | grep -iE 'error|E[0-9]{3,4}:'
 finish() { if [ $fail -eq 0 ]; then echo "All checks passed."; exit 0; else echo "Not done yet - fix the ✘ items and run: vimdrill --check"; exit 1; fi; }
 # ---
 
-P=~/vim-mastery/practice/11.3
+P=${VIMDRILL_WORK:-$HOME/vimdrill}/practice/11.3
 if [ ! -d "$P" ]; then
   mkdir -p "$P/src"
   cat > "$P/package.json" <<'JSON'

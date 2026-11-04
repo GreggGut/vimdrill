@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""vimdrill - daily vim drills, streak and lesson gate for ~/vim-mastery.
+"""vimdrill - daily vim drills, streak and lesson gate.
+
+Progress is kept in $XDG_STATE_HOME/vimdrill (default ~/.local/state/vimdrill;
+$VIMDRILL_HOME overrides it). Files you create in lessons go in ~/vimdrill
+($VIMDRILL_WORK overrides it).
 
   vimdrill                 run today's drill (current lesson)
   vimdrill <id>            practice a specific unlocked drill (doesn't count)
@@ -27,11 +31,17 @@ import tempfile
 import time
 from pathlib import Path
 
-ROOT = Path(os.environ.get("VIM_MASTERY_ROOT", Path.home() / "vim-mastery"))
-STATE = ROOT / "state.json"
-DRILLS = ROOT / "drills"
-CURRICULUM = ROOT / "curriculum"
-LOG = ROOT / "log.jsonl"
+CODE = Path(__file__).resolve().parent.parent
+DRILLS = CODE / "drills"
+CURRICULUM = CODE / "curriculum"
+XDG_STATE = Path(os.environ.get("XDG_STATE_HOME") or "")
+DEFAULT_STATE_DIR = (XDG_STATE if XDG_STATE.is_absolute() else Path.home() / ".local" / "state") / "vimdrill"
+STATE_DIR = Path(os.environ.get("VIMDRILL_HOME") or DEFAULT_STATE_DIR)
+STATE = STATE_DIR / "state.json"
+LOG = STATE_DIR / "log.jsonl"
+TRACKER_URL = STATE_DIR / "tracker_url"
+WORK = Path(os.environ.get("VIMDRILL_WORK") or Path.home() / "vimdrill")
+OLD_HOME = Path.home() / "vim-mastery"  # where everything lived before the public repo
 
 PASS_SCORE = 0.8
 REPEAT_PAR_FACTOR = 1.5
@@ -64,7 +74,7 @@ def next_lesson_id(lessons, lid):
 
 
 def today():
-    return os.environ.get("VIM_MASTERY_TODAY") or dt.date.today().isoformat()
+    return os.environ.get("VIMDRILL_TODAY") or dt.date.today().isoformat()
 
 
 def load_state():
@@ -83,12 +93,14 @@ def load_state():
 
 
 def save_state(state):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
     tmp = STATE.with_suffix(".tmp")
     tmp.write_text(json.dumps(state, indent=2) + "\n")
     tmp.replace(STATE)
 
 
 def log(event):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
     with LOG.open("a") as f:
         f.write(json.dumps({"ts": dt.datetime.now().isoformat(timespec="seconds"), **event}) + "\n")
 
@@ -122,6 +134,23 @@ def streak(state):
         first = False
         d -= dt.timedelta(days=1)
     return count
+
+
+def migrate_old_layout(out):
+    """Copy progress from ~/vim-mastery the first time the default state dir is used. Deletes nothing."""
+    if STATE_DIR != DEFAULT_STATE_DIR or STATE.exists() or not (OLD_HOME / "state.json").exists():
+        return
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    for name in ("log.jsonl", "tracker_url"):
+        if (OLD_HOME / name).exists():
+            shutil.copy2(OLD_HOME / name, STATE_DIR / name)
+    # state last, atomically: it marks the copy as done. A unique tmp name, as several terminals may start at once
+    fd, tmp = tempfile.mkstemp(dir=STATE_DIR, suffix=".tmp")
+    os.close(fd)
+    shutil.copy2(OLD_HOME / "state.json", tmp)
+    os.replace(tmp, STATE)
+    print(f"{DIM}vimdrill: copied your progress from {OLD_HOME} to {STATE_DIR} (the old files are untouched){RST}",
+          file=out)
 
 
 # ---------- drills ----------
@@ -371,7 +400,8 @@ def run_task_drill(lid, check_only):
         print(drill["instructions"].rstrip())
         print(f"\nWhen done, run: {BOLD}vimdrill --check{RST}")
         return None
-    res = subprocess.run(["bash", str(drill_dir(lid) / "check.sh")], capture_output=True, text=True)
+    res = subprocess.run(["bash", str(drill_dir(lid) / "check.sh")], capture_output=True, text=True,
+                         env={**os.environ, "VIMDRILL_WORK": str(WORK)})
     passed = res.returncode == 0
     print((res.stdout + res.stderr).strip())
     print(f"{GRN}{BOLD}PASS{RST}" if passed else f"{RED}{BOLD}NOT YET{RST}")
@@ -609,7 +639,7 @@ def cmd_sync_files(out_dir):
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
     (out / "lessons.json").write_text(json.dumps({"items": items}, indent=1))
     print(json.dumps({"summary": str(out / "summary.json"), "lessons": str(out / "lessons.json"),
-                      "tracker_url": (ROOT / "tracker_url").read_text().strip() if (ROOT / "tracker_url").exists() else None}))
+                      "tracker_url": TRACKER_URL.read_text().strip() if TRACKER_URL.exists() else None}))
 
 
 def cmd_quiz_pool():
@@ -628,6 +658,8 @@ def cmd_quiz_pool():
 
 
 def main(argv):
+    # JSON commands keep stdout parseable; everywhere else (the shell nudge hides stderr) the note must show
+    migrate_old_layout(sys.stderr if argv[:1] in (["--state"], ["--quiz-pool"], ["--sync-files"], ["--record-quiz"]) else sys.stdout)
     if not argv:
         state = load_state()
         if not STATE.exists():
